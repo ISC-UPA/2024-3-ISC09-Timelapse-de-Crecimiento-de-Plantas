@@ -20,7 +20,7 @@ dist/
 *.tsbuildinfo
 
 # Ignorar salidas de GraphQL si se generan automáticamente
-schema.graphql
+
 
 # Carpetas o archivos específicos del entorno de desarrollo
 .vscode/
