@@ -1,0 +1,28 @@
+# Dependencias de Node
+node_modules/
+.env
+
+# Archivos generados por Keystone
+.keystone
+db/
+
+# Archivos de configuración de Prisma (puedes ignorar schema.prisma si se genera automáticamente)
+schema.prisma
+
+# Archivos de cache o configuración específicos del entorno
+.DS_Store
+*.log
+*.lock
+*.tmp
+
+# Configuraciones de TypeScript y salidas de compilación
+dist/
+*.tsbuildinfo
+
+# Ignorar salidas de GraphQL si se generan automáticamente
+schema.graphql
+
+# Carpetas o archivos específicos del entorno de desarrollo
+.vscode/
+.idea/
+*.swp
