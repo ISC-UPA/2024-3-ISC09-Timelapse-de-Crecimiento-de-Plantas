@@ -266,6 +266,7 @@ type Measurement {
   light: Float
   plant: Plant
   device: Device
+  image: UrlImage
   recommendations: Recommendation
 }
 
@@ -284,6 +285,7 @@ input MeasurementWhereInput {
   light: FloatNullableFilter
   plant: PlantWhereInput
   device: DeviceWhereInput
+  image: UrlImageWhereInput
   recommendations: RecommendationWhereInput
 }
 
@@ -313,12 +315,19 @@ input MeasurementUpdateInput {
   light: Float
   plant: PlantRelateToOneForUpdateInput
   device: DeviceRelateToOneForUpdateInput
+  image: UrlImageRelateToOneForUpdateInput
   recommendations: RecommendationRelateToOneForUpdateInput
 }
 
 input PlantRelateToOneForUpdateInput {
   create: PlantCreateInput
   connect: PlantWhereUniqueInput
+  disconnect: Boolean
+}
+
+input UrlImageRelateToOneForUpdateInput {
+  create: UrlImageCreateInput
+  connect: UrlImageWhereUniqueInput
   disconnect: Boolean
 }
 
@@ -340,12 +349,18 @@ input MeasurementCreateInput {
   light: Float
   plant: PlantRelateToOneForCreateInput
   device: DeviceRelateToOneForCreateInput
+  image: UrlImageRelateToOneForCreateInput
   recommendations: RecommendationRelateToOneForCreateInput
 }
 
 input PlantRelateToOneForCreateInput {
   create: PlantCreateInput
   connect: PlantWhereUniqueInput
+}
+
+input UrlImageRelateToOneForCreateInput {
+  create: UrlImageCreateInput
+  connect: UrlImageWhereUniqueInput
 }
 
 input RecommendationRelateToOneForCreateInput {
@@ -408,6 +423,7 @@ type Recommendation {
   date_add: DateTime
   measurement(where: MeasurementWhereInput! = {}, orderBy: [MeasurementOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: MeasurementWhereUniqueInput): [Measurement!]
   measurementCount(where: MeasurementWhereInput! = {}): Int
+  image: UrlImage
 }
 
 input RecommendationWhereUniqueInput {
@@ -422,6 +438,7 @@ input RecommendationWhereInput {
   description: StringFilter
   date_add: DateTimeNullableFilter
   measurement: MeasurementManyRelationFilter
+  image: UrlImageWhereInput
 }
 
 input RecommendationOrderByInput {
@@ -434,6 +451,7 @@ input RecommendationUpdateInput {
   description: String
   date_add: DateTime
   measurement: MeasurementRelateToManyForUpdateInput
+  image: UrlImageRelateToOneForUpdateInput
 }
 
 input RecommendationUpdateArgs {
@@ -445,6 +463,7 @@ input RecommendationCreateInput {
   description: String
   date_add: DateTime
   measurement: MeasurementRelateToManyForCreateInput
+  image: UrlImageRelateToOneForCreateInput
 }
 
 type UrlImage {
@@ -452,6 +471,9 @@ type UrlImage {
   url_image: String
   date_add: DateTime
   device: Device
+  mesurement(where: MeasurementWhereInput! = {}, orderBy: [MeasurementOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: MeasurementWhereUniqueInput): [Measurement!]
+  mesurementCount(where: MeasurementWhereInput! = {}): Int
+  recommendation: Recommendation
 }
 
 input UrlImageWhereUniqueInput {
@@ -466,6 +488,8 @@ input UrlImageWhereInput {
   url_image: StringFilter
   date_add: DateTimeNullableFilter
   device: DeviceWhereInput
+  mesurement: MeasurementManyRelationFilter
+  recommendation: RecommendationWhereInput
 }
 
 input UrlImageOrderByInput {
@@ -478,6 +502,8 @@ input UrlImageUpdateInput {
   url_image: String
   date_add: DateTime
   device: DeviceRelateToOneForUpdateInput
+  mesurement: MeasurementRelateToManyForUpdateInput
+  recommendation: RecommendationRelateToOneForUpdateInput
 }
 
 input UrlImageUpdateArgs {
@@ -489,6 +515,8 @@ input UrlImageCreateInput {
   url_image: String
   date_add: DateTime
   device: DeviceRelateToOneForCreateInput
+  mesurement: MeasurementRelateToManyForCreateInput
+  recommendation: RecommendationRelateToOneForCreateInput
 }
 
 """

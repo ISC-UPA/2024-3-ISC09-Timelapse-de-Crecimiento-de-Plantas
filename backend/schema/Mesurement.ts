@@ -11,6 +11,8 @@ export const measurement = list({
     light: float(),
     plant: relationship({ ref: 'Plant.measurements',many:false } ),
     device: relationship({ ref: 'Device.measurements',many:false }),
+    image:relationship({ref:'UrlImage.mesurement',many:false}),
     recommendations: relationship({ ref: 'Recommendation.measurement', many: false }),
+    
   },
 });
