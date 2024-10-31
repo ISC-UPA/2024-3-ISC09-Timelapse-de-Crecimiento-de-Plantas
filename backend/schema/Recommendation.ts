@@ -7,6 +7,6 @@ export const recommendation = list({
   fields: {
     description: text({ validation: { isRequired: true } }),
     date_add: timestamp({ defaultValue: { kind: 'now' } }),
-    measurement: relationship({ ref: 'Measurement.recommendations' }),
+    measurement: relationship({ ref: 'Measurement.recommendations',many:true }),
   },
 });

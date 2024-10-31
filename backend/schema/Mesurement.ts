@@ -9,8 +9,8 @@ export const measurement = list({
     temperature: float(),
     humidity: float(),
     light: float(),
-    plant: relationship({ ref: 'Plant.measurements' }),
-    device: relationship({ ref: 'Device.measurements' }),
-    recommendations: relationship({ ref: 'Recommendation.measurement', many: true }),
+    plant: relationship({ ref: 'Plant.measurements',many:false } ),
+    device: relationship({ ref: 'Device.measurements',many:false }),
+    recommendations: relationship({ ref: 'Recommendation.measurement', many: false }),
   },
 });

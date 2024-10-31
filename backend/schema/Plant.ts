@@ -7,7 +7,7 @@ export const plant = list({
   fields: {
     name: text({ validation: { isRequired: true } }),
     date_add: timestamp({ defaultValue: { kind: 'now' } }),
-    devices: relationship({ ref: 'Device.plant', many: true }),
+    device: relationship({ ref: 'Device.plant', many: false }),
     measurements: relationship({ ref: 'Measurement.plant', many: true }),
   },
 });

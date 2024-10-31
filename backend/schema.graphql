@@ -6,11 +6,14 @@ type Device {
   name: String
   ubication: String
   date_add: DateTime
-  plant: Plant
+  plant(where: PlantWhereInput! = {}, orderBy: [PlantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PlantWhereUniqueInput): [Plant!]
+  plantCount(where: PlantWhereInput! = {}): Int
   measurements(where: MeasurementWhereInput! = {}, orderBy: [MeasurementOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: MeasurementWhereUniqueInput): [Measurement!]
   measurementsCount(where: MeasurementWhereInput! = {}): Int
   images(where: UrlImageWhereInput! = {}, orderBy: [UrlImageOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UrlImageWhereUniqueInput): [UrlImage!]
   imagesCount(where: UrlImageWhereInput! = {}): Int
+  guestUser(where: GuestUserWhereInput! = {}, orderBy: [GuestUserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: GuestUserWhereUniqueInput): [GuestUser!]
+  guestUserCount(where: GuestUserWhereInput! = {}): Int
 }
 
 scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
@@ -28,9 +31,10 @@ input DeviceWhereInput {
   name: StringFilter
   ubication: StringFilter
   date_add: DateTimeNullableFilter
-  plant: PlantWhereInput
+  plant: PlantManyRelationFilter
   measurements: MeasurementManyRelationFilter
   images: UrlImageManyRelationFilter
+  guestUser: GuestUserManyRelationFilter
 }
 
 input IDFilter {
@@ -83,6 +87,12 @@ input DateTimeNullableFilter {
   not: DateTimeNullableFilter
 }
 
+input PlantManyRelationFilter {
+  every: PlantWhereInput
+  some: PlantWhereInput
+  none: PlantWhereInput
+}
+
 input MeasurementManyRelationFilter {
   every: MeasurementWhereInput
   some: MeasurementWhereInput
@@ -93,6 +103,12 @@ input UrlImageManyRelationFilter {
   every: UrlImageWhereInput
   some: UrlImageWhereInput
   none: UrlImageWhereInput
+}
+
+input GuestUserManyRelationFilter {
+  every: GuestUserWhereInput
+  some: GuestUserWhereInput
+  none: GuestUserWhereInput
 }
 
 input DeviceOrderByInput {
@@ -111,15 +127,17 @@ input DeviceUpdateInput {
   name: String
   ubication: String
   date_add: DateTime
-  plant: PlantRelateToOneForUpdateInput
+  plant: PlantRelateToManyForUpdateInput
   measurements: MeasurementRelateToManyForUpdateInput
   images: UrlImageRelateToManyForUpdateInput
+  guestUser: GuestUserRelateToManyForUpdateInput
 }
 
-input PlantRelateToOneForUpdateInput {
-  create: PlantCreateInput
-  connect: PlantWhereUniqueInput
-  disconnect: Boolean
+input PlantRelateToManyForUpdateInput {
+  disconnect: [PlantWhereUniqueInput!]
+  set: [PlantWhereUniqueInput!]
+  create: [PlantCreateInput!]
+  connect: [PlantWhereUniqueInput!]
 }
 
 input MeasurementRelateToManyForUpdateInput {
@@ -136,6 +154,13 @@ input UrlImageRelateToManyForUpdateInput {
   connect: [UrlImageWhereUniqueInput!]
 }
 
+input GuestUserRelateToManyForUpdateInput {
+  disconnect: [GuestUserWhereUniqueInput!]
+  set: [GuestUserWhereUniqueInput!]
+  create: [GuestUserCreateInput!]
+  connect: [GuestUserWhereUniqueInput!]
+}
+
 input DeviceUpdateArgs {
   where: DeviceWhereUniqueInput!
   data: DeviceUpdateInput!
@@ -145,14 +170,15 @@ input DeviceCreateInput {
   name: String
   ubication: String
   date_add: DateTime
-  plant: PlantRelateToOneForCreateInput
+  plant: PlantRelateToManyForCreateInput
   measurements: MeasurementRelateToManyForCreateInput
   images: UrlImageRelateToManyForCreateInput
+  guestUser: GuestUserRelateToManyForCreateInput
 }
 
-input PlantRelateToOneForCreateInput {
-  create: PlantCreateInput
-  connect: PlantWhereUniqueInput
+input PlantRelateToManyForCreateInput {
+  create: [PlantCreateInput!]
+  connect: [PlantWhereUniqueInput!]
 }
 
 input MeasurementRelateToManyForCreateInput {
@@ -165,9 +191,15 @@ input UrlImageRelateToManyForCreateInput {
   connect: [UrlImageWhereUniqueInput!]
 }
 
+input GuestUserRelateToManyForCreateInput {
+  create: [GuestUserCreateInput!]
+  connect: [GuestUserWhereUniqueInput!]
+}
+
 type GuestUser {
   id: ID!
   id_azure: String
+  device: Device
   name: String
   email: String
 }
@@ -184,6 +216,7 @@ input GuestUserWhereInput {
   NOT: [GuestUserWhereInput!]
   id: IDFilter
   id_azure: StringFilter
+  device: DeviceWhereInput
   name: StringFilter
   email: StringFilter
 }
@@ -197,8 +230,15 @@ input GuestUserOrderByInput {
 
 input GuestUserUpdateInput {
   id_azure: String
+  device: DeviceRelateToOneForUpdateInput
   name: String
   email: String
+}
+
+input DeviceRelateToOneForUpdateInput {
+  create: DeviceCreateInput
+  connect: DeviceWhereUniqueInput
+  disconnect: Boolean
 }
 
 input GuestUserUpdateArgs {
@@ -208,8 +248,14 @@ input GuestUserUpdateArgs {
 
 input GuestUserCreateInput {
   id_azure: String
+  device: DeviceRelateToOneForCreateInput
   name: String
   email: String
+}
+
+input DeviceRelateToOneForCreateInput {
+  create: DeviceCreateInput
+  connect: DeviceWhereUniqueInput
 }
 
 type Measurement {
@@ -220,8 +266,7 @@ type Measurement {
   light: Float
   plant: Plant
   device: Device
-  recommendations(where: RecommendationWhereInput! = {}, orderBy: [RecommendationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: RecommendationWhereUniqueInput): [Recommendation!]
-  recommendationsCount(where: RecommendationWhereInput! = {}): Int
+  recommendations: Recommendation
 }
 
 input MeasurementWhereUniqueInput {
@@ -239,7 +284,7 @@ input MeasurementWhereInput {
   light: FloatNullableFilter
   plant: PlantWhereInput
   device: DeviceWhereInput
-  recommendations: RecommendationManyRelationFilter
+  recommendations: RecommendationWhereInput
 }
 
 input FloatNullableFilter {
@@ -251,12 +296,6 @@ input FloatNullableFilter {
   gt: Float
   gte: Float
   not: FloatNullableFilter
-}
-
-input RecommendationManyRelationFilter {
-  every: RecommendationWhereInput
-  some: RecommendationWhereInput
-  none: RecommendationWhereInput
 }
 
 input MeasurementOrderByInput {
@@ -274,20 +313,19 @@ input MeasurementUpdateInput {
   light: Float
   plant: PlantRelateToOneForUpdateInput
   device: DeviceRelateToOneForUpdateInput
-  recommendations: RecommendationRelateToManyForUpdateInput
+  recommendations: RecommendationRelateToOneForUpdateInput
 }
 
-input DeviceRelateToOneForUpdateInput {
-  create: DeviceCreateInput
-  connect: DeviceWhereUniqueInput
+input PlantRelateToOneForUpdateInput {
+  create: PlantCreateInput
+  connect: PlantWhereUniqueInput
   disconnect: Boolean
 }
 
-input RecommendationRelateToManyForUpdateInput {
-  disconnect: [RecommendationWhereUniqueInput!]
-  set: [RecommendationWhereUniqueInput!]
-  create: [RecommendationCreateInput!]
-  connect: [RecommendationWhereUniqueInput!]
+input RecommendationRelateToOneForUpdateInput {
+  create: RecommendationCreateInput
+  connect: RecommendationWhereUniqueInput
+  disconnect: Boolean
 }
 
 input MeasurementUpdateArgs {
@@ -302,25 +340,24 @@ input MeasurementCreateInput {
   light: Float
   plant: PlantRelateToOneForCreateInput
   device: DeviceRelateToOneForCreateInput
-  recommendations: RecommendationRelateToManyForCreateInput
+  recommendations: RecommendationRelateToOneForCreateInput
 }
 
-input DeviceRelateToOneForCreateInput {
-  create: DeviceCreateInput
-  connect: DeviceWhereUniqueInput
+input PlantRelateToOneForCreateInput {
+  create: PlantCreateInput
+  connect: PlantWhereUniqueInput
 }
 
-input RecommendationRelateToManyForCreateInput {
-  create: [RecommendationCreateInput!]
-  connect: [RecommendationWhereUniqueInput!]
+input RecommendationRelateToOneForCreateInput {
+  create: RecommendationCreateInput
+  connect: RecommendationWhereUniqueInput
 }
 
 type Plant {
   id: ID!
   name: String
   date_add: DateTime
-  devices(where: DeviceWhereInput! = {}, orderBy: [DeviceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: DeviceWhereUniqueInput): [Device!]
-  devicesCount(where: DeviceWhereInput! = {}): Int
+  device: Device
   measurements(where: MeasurementWhereInput! = {}, orderBy: [MeasurementOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: MeasurementWhereUniqueInput): [Measurement!]
   measurementsCount(where: MeasurementWhereInput! = {}): Int
 }
@@ -336,14 +373,8 @@ input PlantWhereInput {
   id: IDFilter
   name: StringFilter
   date_add: DateTimeNullableFilter
-  devices: DeviceManyRelationFilter
+  device: DeviceWhereInput
   measurements: MeasurementManyRelationFilter
-}
-
-input DeviceManyRelationFilter {
-  every: DeviceWhereInput
-  some: DeviceWhereInput
-  none: DeviceWhereInput
 }
 
 input PlantOrderByInput {
@@ -355,15 +386,8 @@ input PlantOrderByInput {
 input PlantUpdateInput {
   name: String
   date_add: DateTime
-  devices: DeviceRelateToManyForUpdateInput
+  device: DeviceRelateToOneForUpdateInput
   measurements: MeasurementRelateToManyForUpdateInput
-}
-
-input DeviceRelateToManyForUpdateInput {
-  disconnect: [DeviceWhereUniqueInput!]
-  set: [DeviceWhereUniqueInput!]
-  create: [DeviceCreateInput!]
-  connect: [DeviceWhereUniqueInput!]
 }
 
 input PlantUpdateArgs {
@@ -374,20 +398,16 @@ input PlantUpdateArgs {
 input PlantCreateInput {
   name: String
   date_add: DateTime
-  devices: DeviceRelateToManyForCreateInput
+  device: DeviceRelateToOneForCreateInput
   measurements: MeasurementRelateToManyForCreateInput
-}
-
-input DeviceRelateToManyForCreateInput {
-  create: [DeviceCreateInput!]
-  connect: [DeviceWhereUniqueInput!]
 }
 
 type Recommendation {
   id: ID!
   description: String
   date_add: DateTime
-  measurement: Measurement
+  measurement(where: MeasurementWhereInput! = {}, orderBy: [MeasurementOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: MeasurementWhereUniqueInput): [Measurement!]
+  measurementCount(where: MeasurementWhereInput! = {}): Int
 }
 
 input RecommendationWhereUniqueInput {
@@ -401,7 +421,7 @@ input RecommendationWhereInput {
   id: IDFilter
   description: StringFilter
   date_add: DateTimeNullableFilter
-  measurement: MeasurementWhereInput
+  measurement: MeasurementManyRelationFilter
 }
 
 input RecommendationOrderByInput {
@@ -413,13 +433,7 @@ input RecommendationOrderByInput {
 input RecommendationUpdateInput {
   description: String
   date_add: DateTime
-  measurement: MeasurementRelateToOneForUpdateInput
-}
-
-input MeasurementRelateToOneForUpdateInput {
-  create: MeasurementCreateInput
-  connect: MeasurementWhereUniqueInput
-  disconnect: Boolean
+  measurement: MeasurementRelateToManyForUpdateInput
 }
 
 input RecommendationUpdateArgs {
@@ -430,12 +444,7 @@ input RecommendationUpdateArgs {
 input RecommendationCreateInput {
   description: String
   date_add: DateTime
-  measurement: MeasurementRelateToOneForCreateInput
-}
-
-input MeasurementRelateToOneForCreateInput {
-  create: MeasurementCreateInput
-  connect: MeasurementWhereUniqueInput
+  measurement: MeasurementRelateToManyForCreateInput
 }
 
 type UrlImage {
