@@ -1,5 +1,5 @@
 import { list } from '@keystone-6/core';
-import { text } from '@keystone-6/core/fields';
+import { relationship, text } from '@keystone-6/core/fields';
 import { allowAll } from '@keystone-6/core/access';
 
 export const guestUser = list({
@@ -9,6 +9,10 @@ export const guestUser = list({
       validation: { isRequired: true },
       isIndexed: 'unique',  // Configura el campo como único
     }),
+    device: relationship(
+       {ref: "Device.guestUser" , many:false },
+      
+    ),
     name: text({
       validation: { isRequired: true },
     }),
