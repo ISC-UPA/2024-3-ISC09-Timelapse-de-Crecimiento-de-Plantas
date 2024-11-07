@@ -1,4 +1,3 @@
-// LoginPage.styles.ts
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -6,6 +5,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
+    alignItems: 'center', // Centra todo el contenido
   },
   reactLogo: {
     height: 100,
@@ -36,6 +36,10 @@ export const styles = StyleSheet.create({
   formContainer: {
     gap: 16,
     marginBottom: 20,
+    width: '100%', // Asegura que ocupe el 100% del contenedor
+    maxWidth: 400, // Límite máximo de ancho para el formulario
+    padding: 20, // Relleno adicional para los campos
+    alignItems: 'center', // Centra el formulario
   },
   input: {
     height: 45,
@@ -44,6 +48,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 15,
     fontSize: 16,
+    width: '100%', // Hace que el input ocupe el 100% del contenedor
+    backgroundColor: '#fff',
   },
   footerContainer: {
     alignItems: 'center',
@@ -52,5 +58,11 @@ export const styles = StyleSheet.create({
   signUpText: {
     fontWeight: 'bold',
     color: '#0066CC',
+  },
+
+  // Estilos específicos para web
+  webInput: {
+    fontSize: 12, // Reduce el tamaño del texto en la versión web
+    height: 40, // Reduce la altura en la versión web
   },
 });

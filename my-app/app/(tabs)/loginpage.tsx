@@ -1,18 +1,30 @@
+// LoginPage.tsx
 import { useState } from 'react';
-import { TextInput, Button, Text, View, Image, ScrollView, useColorScheme } from 'react-native';
+import { TextInput, Button, Text, View, Image, ScrollView, useColorScheme, Platform } from 'react-native';
 import { HelloWave } from '@/components/HelloWave'; // Importar el componente HelloWave
 import { styles } from '../styles/loginpage'; // Importar los estilos
+import Notification from '@/components/Notification'; // Importar el nuevo componente de notificación
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // Estado para el mensaje de error
 
   // Detectar el esquema de color (light o dark)
   const colorScheme = useColorScheme();
 
   const handleLogin = () => {
+    // Verificar si los campos están vacíos
+    if (!email || !password) {
+      // Setear el mensaje de error
+      setErrorMessage('Please enter both email and password.');
+      return;
+    }
+
     // Lógica de autenticación
     console.log('Email:', email, 'Password:', password);
+    // Limpiar el mensaje de error si la autenticación es exitosa
+    setErrorMessage('');
   };
 
   // Definir colores según el esquema
@@ -42,7 +54,7 @@ export default function LoginPage() {
         <Text style={[styles.subtitle, { color: textColor }]}>Enter your details</Text>
         
         <TextInput
-          style={[styles.input, { backgroundColor: inputBackgroundColor, borderColor: inputBorderColor }]}
+          style={[styles.input, { backgroundColor: inputBackgroundColor, borderColor: inputBorderColor, ...Platform.select({ web: styles.webInput }) }]}
           placeholder="Email"
           placeholderTextColor={colorScheme === 'dark' ? '#bbb' : '#666'}
           keyboardType="email-address"
@@ -51,7 +63,7 @@ export default function LoginPage() {
         />
         
         <TextInput
-          style={[styles.input, { backgroundColor: inputBackgroundColor, borderColor: inputBorderColor }]}
+          style={[styles.input, { backgroundColor: inputBackgroundColor, borderColor: inputBorderColor, ...Platform.select({ web: styles.webInput }) }]}
           placeholder="Password"
           placeholderTextColor={colorScheme === 'dark' ? '#bbb' : '#666'}
           secureTextEntry
@@ -67,6 +79,9 @@ export default function LoginPage() {
           Don't have an account? <Text style={styles.signUpText}>Sign Up</Text>
         </Text>
       </View>
+
+      {/* Usar el componente Notification para mostrar alertas si hay un error */}
+      {errorMessage && <Notification message={errorMessage} />}
     </ScrollView>
   );
 }
