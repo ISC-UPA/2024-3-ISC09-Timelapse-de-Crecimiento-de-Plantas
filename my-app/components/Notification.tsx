@@ -1,5 +1,5 @@
 // components/Notification.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Platform, Alert } from 'react-native';
 
 interface NotificationProps {
@@ -7,6 +7,8 @@ interface NotificationProps {
 }
 
 const Notification: React.FC<NotificationProps> = ({ message }) => {
+  const [canShowAlert, setCanShowAlert] = useState(true); // Estado para controlar el cooldown
+
   // Función para mostrar la notificación de alerta
   const showAlert = () => {
     if (Platform.OS === 'web') {
@@ -18,12 +20,21 @@ const Notification: React.FC<NotificationProps> = ({ message }) => {
     }
   };
 
-  // Llamar a la función de alerta cuando el mensaje cambia
-  React.useEffect(() => {
-    if (message) {
+  // Llamar a la función de alerta cuando el mensaje cambia y el cooldown esté permitido
+  useEffect(() => {
+    if (message && canShowAlert) {
       showAlert();
+      setCanShowAlert(false); // Deshabilitar el envío de notificaciones durante el cooldown
+
+      // Reactivar el envío de notificaciones después de 5 segundos
+      const timer = setTimeout(() => {
+        setCanShowAlert(true);
+      }, 50);
+
+      // Limpiar el timeout cuando el componente se desmonte
+      return () => clearTimeout(timer);
     }
-  }, [message]);
+  }, [message, canShowAlert]);
 
   return null; // Este componente no necesita renderizar nada visible
 };
