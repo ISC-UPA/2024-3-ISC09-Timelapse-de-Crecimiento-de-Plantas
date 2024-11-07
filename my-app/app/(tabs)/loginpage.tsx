@@ -1,9 +1,8 @@
-// LoginPage.tsx
 import { useState } from 'react';
-import { TextInput, Button, Text, View, Image, ScrollView, useColorScheme, Platform } from 'react-native';
+import { TextInput, Button, Text, View, Image, ScrollView, useColorScheme, Platform, TouchableOpacity, Alert } from 'react-native';
 import { HelloWave } from '@/components/HelloWave'; // Importar el componente HelloWave
 import { styles } from '../styles/loginpage'; // Importar los estilos
-import Notification from '@/components/Notification'; // Importar el nuevo componente de notificación
+import Notification from '@/components/Notification'; // Importar el componente Notification
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,11 +17,16 @@ export default function LoginPage() {
     if (!email || !password) {
       // Setear el mensaje de error
       setErrorMessage('Please enter both email and password.');
+
+      // Mostrar una alerta nativa con el mensaje de error
+      Alert.alert('Login Error', 'Please enter both email and password.');
+
       return;
     }
 
     // Lógica de autenticación
-    console.log('Email:', email, 'Password:', password);
+    console.log('Email:', email, 'Password:', password); // Mostrar en consola los datos ingresados
+
     // Limpiar el mensaje de error si la autenticación es exitosa
     setErrorMessage('');
   };
@@ -44,7 +48,7 @@ export default function LoginPage() {
         <Text style={[styles.title, { color: textColor }]}>Login</Text>
         <View style={styles.welcomeBackContainer}>
           {/* El componente HelloWave a la izquierda del emoji */}
-          <HelloWave/>
+          <HelloWave />
           {/* El emoji 👋 y el texto "Welcome back!" */}
           <Text style={[styles.subtitle, { color: textColor }]}> Welcome back!</Text>
         </View>
@@ -70,8 +74,19 @@ export default function LoginPage() {
           value={password}
           onChangeText={setPassword}
         />
-        
-        <Button title="Login" onPress={handleLogin} color={buttonColor} />
+
+        {/* Botón de login personalizado */}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: buttonColor }]}
+          onPress={handleLogin}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+
+        {/* Si hay un mensaje de error, mostrar el componente Notification */}
+        {errorMessage && (
+          <Notification message={errorMessage} />
+        )}
       </View>
       
       <View style={styles.footerContainer}>
@@ -79,9 +94,6 @@ export default function LoginPage() {
           Don't have an account? <Text style={styles.signUpText}>Sign Up</Text>
         </Text>
       </View>
-
-      {/* Usar el componente Notification para mostrar alertas si hay un error */}
-      {errorMessage && <Notification message={errorMessage} />}
     </ScrollView>
   );
 }

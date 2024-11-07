@@ -1,3 +1,4 @@
+// LoginPage.styles.ts
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -58,6 +59,21 @@ export const styles = StyleSheet.create({
   signUpText: {
     fontWeight: 'bold',
     color: '#0066CC',
+  },
+
+  // Estilos para el botón personalizado
+  button: {
+    height: 45,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%', // Asegura que el botón ocupe el 100% del contenedor
+    marginTop: 20,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 
   // Estilos específicos para web
