@@ -34,6 +34,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="datadashboard"
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+          ),
+        }}
+      />
+¿        
+      
       {/* Pantalla de Login (sin usar 'component') */}
       <Tabs.Screen
         name="loginpage" // Nombre para acceder a la pantalla de login
