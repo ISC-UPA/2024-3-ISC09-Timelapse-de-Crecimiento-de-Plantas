@@ -5,37 +5,38 @@ import {
   makeRedirectUri,
   useAuthRequest,
   useAutoDiscovery,
+  TokenResponse,
+  TokenResponseConfig,
+  RefreshTokenRequestConfig,
+  DiscoveryDocument
 } from 'expo-auth-session';
-import { Text, SafeAreaView, Platform, TouchableOpacity } from 'react-native';
+import { Button, Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import createStyles from '../styles/loginpage'; // Importa los estilos dinámicos
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function App() {
+  const colorScheme = useColorScheme(); // Detecta el tema claro u oscuro
+  const styles = createStyles(colorScheme || 'light'); // Aplica los estilos según el tema
+
   const discovery = useAutoDiscovery(
     'https://login.microsoftonline.com/2803e296-cffb-471f-a4b5-988a45052db6/v2.0'
   );
+  const tokenEndpoint = 'https://login.microsoftonline.com/2803e296-cffb-471f-a4b5-988a45052db6/oauth2/v2.0/token';
 
-  const redirectUri = makeRedirectUri({
-    scheme: 'myapp',
-    path: Platform.select({
-      ios: '',
-      android: '',
-      default: '',
-    }),
-  });
-
+  const redirectUri = makeRedirectUri({ scheme: 'myapp', path: '' });
   const clientId = 'b6003d17-274d-46dd-87fc-ee9633ef41b0';
 
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Para indicar si estamos verificando el token al inicio
 
   const [request, , promptAsync] = useAuthRequest(
     {
       clientId,
       scopes: ['openid', 'profile', 'email', 'offline_access'],
       redirectUri,
-      prompt: 'select_account',
+      prompt: 'select_account', // Pide selección de cuenta si no hay token
     },
     discovery
   );
@@ -46,7 +47,7 @@ export default function App() {
       if (savedToken) {
         setToken(savedToken);
       }
-      setIsLoading(false);
+      setIsLoading(false); // Ya se ha cargado el token o se sabe que no existe
     };
     loadToken();
   }, []);
@@ -92,27 +93,23 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
+    <SafeAreaView style={styles.container}>
       {isLoading ? (
-        <Text style={{ fontSize: 18 }}>Cargando...</Text>
+        <Text style={styles.text}>Cargando...</Text> // Muestra "Cargando..." mientras verifica el token
       ) : (
         <>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#0078d4',
-              paddingVertical: 12,
-              paddingHorizontal: 32,
-              borderRadius: 8,
-              marginBottom: 20,
-            }}
-            disabled={!request && !discovery}
-            onPress={token ? handleSignOut : handleSignIn}
-          >
-            <Text style={{ color: '#fff', fontSize: 16 }}>
-              {token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}
-            </Text>
+          <TouchableOpacity style={styles.button} onPress={token ? handleSignOut : handleSignIn}>
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('../../assets/images/microsoft.png')}
+                style={styles.buttonImage}
+              />
+              <Text style={styles.buttonText}>
+                {token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}
+              </Text>
+            </View>
           </TouchableOpacity>
-          <Text style={{ fontSize: 16 }}>
+          <Text style={styles.text}>
             {token ? 'Sesión iniciada' : 'Por favor, inicia sesión'}
           </Text>
         </>
