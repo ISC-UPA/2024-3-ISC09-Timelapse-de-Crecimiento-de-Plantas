@@ -10,7 +10,7 @@ import {
   RefreshTokenRequestConfig,
   DiscoveryDocument
 } from 'expo-auth-session';
-import { Button, Text, SafeAreaView, useColorScheme, TouchableOpacity } from 'react-native';
+import { Button, Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createStyles from '../styles/loginpage'; // Importa los estilos dinámicos
 
@@ -98,15 +98,17 @@ export default function App() {
         <Text style={styles.text}>Cargando...</Text> // Muestra "Cargando..." mientras verifica el token
       ) : (
         <>
-          {token ? (
-            <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-              <Text style={styles.buttonText}>Cerrar sesión</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-              <Text style={styles.buttonText}>Iniciar sesión con Azure</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity style={styles.button} onPress={token ? handleSignOut : handleSignIn}>
+            <View style={styles.buttonContent}>
+              <Image
+                source={require('../../assets/images/microsoft.png')}
+                style={styles.buttonImage}
+              />
+              <Text style={styles.buttonText}>
+                {token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}
+              </Text>
+            </View>
+          </TouchableOpacity>
           <Text style={styles.text}>
             {token ? 'Sesión iniciada' : 'Por favor, inicia sesión'}
           </Text>

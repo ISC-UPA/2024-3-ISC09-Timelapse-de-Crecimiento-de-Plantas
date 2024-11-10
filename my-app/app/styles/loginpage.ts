@@ -21,6 +21,16 @@ const createStyles = (theme: string) => {
       borderRadius: 8,
       marginBottom: 20,
     },
+    buttonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonImage: {
+      width: 24,
+      height: 24,
+      marginRight: 10, // Espacio entre la imagen y el texto
+    },
     buttonText: {
       color: '#ffffff', // Color del texto del botón
       fontSize: 18,
