@@ -17,24 +17,6 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="datadashboard"
         options={{
           tabBarIcon: ({ color, focused }) => (
@@ -42,8 +24,6 @@ export default function TabLayout() {
           ),
         }}
       />
-¿        
-      
       {/* Pantalla de Login (sin usar 'component') */}
       <Tabs.Screen
         name="loginpage" // Nombre para acceder a la pantalla de login
