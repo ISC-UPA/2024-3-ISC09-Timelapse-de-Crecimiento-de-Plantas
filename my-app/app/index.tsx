@@ -5,16 +5,14 @@ import {
   makeRedirectUri,
   useAuthRequest,
   useAutoDiscovery,
-  TokenResponse,
-  TokenResponseConfig,
-  RefreshTokenRequestConfig,
-  DiscoveryDocument
 } from 'expo-auth-session';
-import { Button, Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View } from 'react-native';
+import { Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View, Platform, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import createStyles from '../styles/loginpage'; // Importa los estilos dinámicos
+import createStyles from './styles/loginpage'; // Importa los estilos dinámicos
 
 WebBrowser.maybeCompleteAuthSession();
+
+const { width, height } = Dimensions.get('window'); // Obtiene las dimensiones de la pantalla
 
 export default function App() {
   const colorScheme = useColorScheme(); // Detecta el tema claro u oscuro
@@ -36,7 +34,7 @@ export default function App() {
       clientId,
       scopes: ['openid', 'profile', 'email', 'offline_access'],
       redirectUri,
-      prompt: 'select_account', // Pide selección de cuenta si no hay token
+      prompt: 'select_account',
     },
     discovery
   );
@@ -47,7 +45,7 @@ export default function App() {
       if (savedToken) {
         setToken(savedToken);
       }
-      setIsLoading(false); // Ya se ha cargado el token o se sabe que no existe
+      setIsLoading(false);
     };
     loadToken();
   }, []);
@@ -95,24 +93,39 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       {isLoading ? (
-        <Text style={styles.text}>Cargando...</Text> // Muestra "Cargando..." mientras verifica el token
+        <Text style={styles.text}>Cargando...</Text>
       ) : (
-        <>
-          <TouchableOpacity style={styles.button} onPress={token ? handleSignOut : handleSignIn}>
-            <View style={styles.buttonContent}>
-              <Image
-                source={require('../../assets/images/microsoft.png')}
-                style={styles.buttonImage}
-              />
-              <Text style={styles.buttonText}>
-                {token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.text}>
-            {token ? 'Sesión iniciada' : 'Por favor, inicia sesión'}
-          </Text>
-        </>
+        <View style={styles.loginContainer}>
+          {/* Sección izquierda con el mensaje de bienvenida */}
+          <View style={styles.welcomeSection}>
+            <Text style={styles.welcomeTitle}>Welcome to...</Text>
+            <Text style={styles.welcomeText}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </Text>
+          </View>
+
+          {/* Sección derecha con el logo, botón de inicio de sesión y mensaje */}
+          <View style={styles.loginSection}>
+            <Image
+              source={require('../assets/images/PlantLogo.jpeg')}
+              style={[styles.logo, Platform.OS === 'web' ? { width: 150, height: 150 } : { width: width * 0.4, height: width * 0.4 }]} // Ajusta el tamaño del logo en web y móvil
+            />
+            <TouchableOpacity style={styles.microsoftButton} onPress={token ? handleSignOut : handleSignIn}>
+              <View style={styles.buttonContent}>
+                <Image
+                  source={require('../assets/images/microsoft.png')}
+                  style={[styles.buttonImage, { width: 24, height: 24 }]} // Ajusta el tamaño de la imagen del botón
+                />
+                <Text style={[styles.buttonText, Platform.OS === 'web' ? { fontSize: 14 } : { fontSize: 12 }]}>
+                  {token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.loginMessage}>
+              {token ? 'Sesión iniciada' : 'Por favor, inicia sesión'}
+            </Text>
+          </View>
+        </View>
       )}
     </SafeAreaView>
   );
