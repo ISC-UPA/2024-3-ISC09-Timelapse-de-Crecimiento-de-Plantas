@@ -1,25 +1,74 @@
-// PlantsScreen.tsx
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import PlantCard from '../../components/PlantCard';
+import { useQuery } from '@apollo/client';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  Dimensions 
+} from 'react-native';
+import { GET_PLANTS ,Plant } from '@/api/queries/queryPlants';
 
-// Obtiene el ancho de la pantalla para hacer el ajuste
+// Define la interfaz para el tipo de planta
+
+
 const screenWidth = Dimensions.get('window').width;
 const isWideScreen = screenWidth > 800;
 
-const PlantsScreen: React.FC = () => {
-  const plants = ['Plant 1', 'Plant 2', 'Plant 3', 'Plant 4'];
+const PlantPage: React.FC = () => {
+
+  const { data, loading, error } = useQuery(GET_PLANTS, {
+    variables: {
+      where: {
+        device: {
+          id: {
+            equals: 'cm2v8493x00017664hjngsusm',//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
+          },
+        },
+      },
+    },
+  });
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#78B494" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error al cargar las plantas.</Text>
+      </View>
+    );
+  }
+
+  const plants: Plant[] = data?.plants || [];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Plants</Text>
-      <Text style={styles.subtitle}>Choose a plant</Text>
 
+     {
+        ///recorre el array de plants tipando cada elemento con la interface platas declarada arriba
+     } 
+      
       <View style={styles.plantsContainer}>
-        {plants.map((plant, index) => (
-          <PlantCard key={index} plant={plant} isWideScreen={isWideScreen} />
+        {plants.map((plant: Plant) => ( 
+          <View key={plant.id} style={styles.plantCard}>
+            <Text style={styles.plantName}>{plant.name}</Text>
+            {plant.description && (
+              <Text style={styles.plantDescription}>
+                {plant.description}
+              </Text>
+            )}
+          </View>
         ))}
       </View>
+
     </ScrollView>
   );
 };
@@ -27,7 +76,7 @@ const PlantsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8f9fa',
     paddingVertical: 20,
     flexGrow: 1,
     borderRadius: 12,
@@ -40,25 +89,58 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  title: {
-    fontSize: 20,
-    color: '#78B494',
-    marginTop: 20,
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  subtitle: {
-    fontSize: 24,
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8d7da',
+    borderRadius: 10,
+    padding: 20,
+    margin: 10,
+  },
+  errorText: {
+    color: '#721c24',
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#0F5A32',
-    marginVertical: 20,
   },
   plantsContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
     width: '100%',
-    justifyContent: 'center',
-    alignItems: isWideScreen ? 'flex-start' : 'center',
-    flexDirection: isWideScreen ? 'row' : 'column',
-    flexWrap: isWideScreen ? 'wrap' : 'nowrap',
-    paddingHorizontal: isWideScreen ? 20 : 0,
+  },
+  plantCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  plantName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#343a40',
+    marginBottom: 5,
+  },
+  plantDescription: {
+    fontSize: 14,
+    color: '#6c757d',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#495057',
+    marginBottom: 20,
   },
 });
 
-export default PlantsScreen;
+export default PlantPage;

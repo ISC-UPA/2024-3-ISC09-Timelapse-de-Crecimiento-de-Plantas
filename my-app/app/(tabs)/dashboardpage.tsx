@@ -1,9 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import ChartWidget from '../../components/ChartWidget';
+import { GET_PLANTS } from '@/api/queries/queryPlants';
+import client from '@/api/apolloClient';
 
 
 const DashboardScreen: React.FC = () => {
+
+  
+
+
   const data = [
     { value: 50 }, { value: 80 }, { value: 45 }, { value: 75 }, { value: 60 },
     { value: 90 }, { value: 100 }, { value: 55 }, { value: 85 }, { value: 70 }
