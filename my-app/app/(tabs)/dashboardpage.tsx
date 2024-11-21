@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import ChartWidget from '../../components/ChartWidget';
-
+import UserInfo from '../../components/userinfo'; // Importa el componente UserInfo
 
 const DashboardScreen: React.FC = () => {
   const data = [
@@ -13,11 +13,13 @@ const DashboardScreen: React.FC = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Overview</Text>
       <Text style={styles.dashboardTitle}>Dashboard</Text>
+      
+      {/* Agregar UserInfo */}
+      <UserInfo />
 
       <ChartWidget title="Temperature" value="127,425" data={data} color="#78B494" />
       <ChartWidget title="Humidity" value="21.8%" data={data} color="#4B966E" />
       <ChartWidget title="Light" value="05:34" data={data} color="#28784D" />
-      
     </ScrollView>
   );
 };
