@@ -10,8 +10,7 @@ import {
 } from 'react-native';
 import { GET_PLANTS ,Plant } from '@/api/queries/queryPlants';
 
-// Define la interfaz para el tipo de planta
-
+// Define la interfaz para el tipo de plant
 
 const screenWidth = Dimensions.get('window').width;
 const isWideScreen = screenWidth > 800;
@@ -23,7 +22,7 @@ const PlantPage: React.FC = () => {
       where: {
         device: {
           id: {
-            equals: 'cm2v8493x00017664hjngsusm',//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
+            equals: 'cm2v83y5c00007664w4dvdgx9',//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
           },
         },
       },

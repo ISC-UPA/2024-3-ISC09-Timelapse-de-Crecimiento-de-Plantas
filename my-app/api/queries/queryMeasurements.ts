@@ -1,10 +1,12 @@
 import { gql } from '@apollo/client';
 
+
 export interface Measurement {
     light: number,
-    humidity: boolean,
+    humidity: number,
     temperature: number;
     image: string;
+    date_add: string;
 }
 
 export const  GET_MEASUREMENTS = gql`query Measurements($where: MeasurementWhereInput!) {
@@ -15,21 +17,28 @@ export const  GET_MEASUREMENTS = gql`query Measurements($where: MeasurementWhere
         image {
               url_image
         }
+        date_add
     }
 }`
 
-/*
-    Ejemplo del where que deberia de enviarse en esta peticion 
-
-    {
+/* ejemplo de query
+ {
   "where": {
-    "date_add": {
-    "gt": "2024-11-11T00:00:00.000Z", fecha mayor que 
-    "lt": "2024-11-22T00:00:00.000Z" fecha menor que
-            }
+    "plant": {
+      "id": {
+        "equals": "cm2v83y5c00007664w4dvdgx9" codigo de planta
+      }
+    },
+    "AND": [
+      {
+        "date_add": {
+          "gt": "2024-11-11T00:00:00.000Z",
+          "lt": "2024-11-22T00:00:00.000Z"
         }
-    }
- 
+      }
+    ]
+  }
+}
  */
 
 
