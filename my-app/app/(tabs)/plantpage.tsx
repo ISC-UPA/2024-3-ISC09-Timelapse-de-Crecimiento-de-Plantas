@@ -57,24 +57,11 @@ const PlantPage: React.FC = () => {
         ///recorre el array de plants tipando cada elemento con la interface platas declarada arriba
      } 
       
-      {/* <View style={[styles.plantsContainer, isWideScreen && styles.plantsRow]}>
-        {plants.map((plant: Plant) => ( 
-          <View key={plant.id} style={styles.plantCard}>
-            <Text style={styles.plantName}>{plant.name}</Text>
-            {plant.description && (
-              <Text style={styles.plantDescription}>
-                {plant.description}
-              </Text>
-            )}
-          </View>
-        ))}
-      </View> */}
       <View style={[styles.plantsContainer, isWideScreen && styles.plantsRow]}>
         {plants.map((plant) => (
           <PlantCard key={plant.id} plant={plant} isWideScreen={isWideScreen} />
         ))}
       </View>
-    
 
     </ScrollView>
   );
@@ -87,6 +74,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     flexGrow: 1,
     paddingHorizontal: 10,
+  
   },
   largeContainer: {
     alignItems: 'center',
