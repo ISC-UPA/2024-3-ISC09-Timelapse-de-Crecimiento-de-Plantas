@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useQuery } from '@apollo/client';
 import ChartWidget from '../../components/ChartWidget';
 import { GET_MEASUREMENTS,Measurement } from '@/api/queries/queryMeasurements';
@@ -27,6 +27,9 @@ const  getDayStartAndEnd =()=> {
 
 
 const DashboardScreen: React.FC = () => {
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 1024;
+
 
   const { startOfDay, endOfDay } = getDayStartAndEnd();
   const [mesage,setMesage] = React.useState("");
@@ -148,13 +151,19 @@ obtenerConsejo();
  
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, isLargeScreen && styles.largeContainer]}>
       
       <Text style={styles.title}>Overview</Text>
       <Text style={styles.dashboardTitle}>Dashboard</Text>
 
-
-      <ScrollView style={styles.tableContainer}  >
+        <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
+         
+          <ChartWidget title="Temperature" value="127,425" data={dataTempetarure} color="#78B494" />
+          <ChartWidget title="Humidity" value="21.8%" data={dataHumidity} color="#4B966E" />
+          <ChartWidget title="Light" value="05:34" data={dataLight} color="#28784D" />
+        
+        </View>
+        <ScrollView style={styles.tableContainer}  >
       <table style={styles.table}>
             <tr>
               <th>Light</th>
@@ -175,12 +184,6 @@ obtenerConsejo();
 
       </ScrollView>
 
-
-  
-        <ChartWidget title="Temperature" value="127,425" data={dataTempetarure} color="#78B494" />
-        <ChartWidget title="Humidity" value="21.8%" data={dataHumidity} color="#4B966E" />
-        <ChartWidget title="Light" value="05:34" data={dataLight} color="#28784D" />
-    
         
       
       <ScrollView  >
@@ -194,10 +197,16 @@ obtenerConsejo();
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
     backgroundColor: '#f1f1f1',
     paddingVertical: 20,
     flexGrow: 1,
+    alignItems: 'center', // Por defecto, centra las tarjetas
+    paddingHorizontal: 10,
+
+  },
+  largeContainer: {
+    alignItems: 'center', // En pantallas grandes, alinea hacia la izquierda
+    paddingHorizontal: 180,
   },
   loaderContainer: {
     flex: 1,
@@ -219,15 +228,26 @@ const styles = StyleSheet.create({
     height: 150,
     width: 300,
     borderWidth: 1,
+    backgroundColor: '#0F5A32',
     borderColor: '#000',
     overflow: 'scroll',},
 
   table: {
     width: '100%',
-     
     borderWidth: 1,
     borderColor: '#000',
+    backgroundColor: '#fff',
     overflow: 'scroll',
+  },
+  widgetsContainer: {
+    flexDirection: 'column', // Por defecto, organiza en columna
+    width: '100%',
+    alignItems: 'center'
+  },
+  widgetsRow: {
+    flexDirection: 'row', // En pantallas grandes, organiza en fila
+    justifyContent: 'center', // Alinea hacia la derecha
+    flexWrap: 'wrap',
   },
 
 });
