@@ -6,23 +6,25 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  Dimensions 
+  Dimensions,
+  useWindowDimensions, 
 } from 'react-native';
+import PlantCard from '@/components/PlantCard';
 import { GET_PLANTS ,Plant } from '@/api/queries/queryPlants';
 
 // Define la interfaz para el tipo de plant
 
-const screenWidth = Dimensions.get('window').width;
-const isWideScreen = screenWidth > 800;
-
 const PlantPage: React.FC = () => {
+
+  const { width } = useWindowDimensions();
+  const isWideScreen = width > 1024; // Determina si está en pantalla grande
 
   const { data, loading, error } = useQuery(GET_PLANTS, {
     variables: {
       where: {
         device: {
           id: {
-            equals: 'cm2v83y5c00007664w4dvdgx9',//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
+            equals: 'cm3usu7ko00013v36s97yrq9n',//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
           },
         },
       },
@@ -48,14 +50,14 @@ const PlantPage: React.FC = () => {
   const plants: Plant[] = data?.plants || [];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Plants</Text>
-
+    <ScrollView contentContainerStyle={[styles.container, isWideScreen && styles.largeContainer]}>
+        <Text style={styles.title}>Plants</Text>
+        <Text style={styles.subtitle}>Choose a plant</Text>
      {
         ///recorre el array de plants tipando cada elemento con la interface platas declarada arriba
      } 
       
-      <View style={styles.plantsContainer}>
+      {/* <View style={[styles.plantsContainer, isWideScreen && styles.plantsRow]}>
         {plants.map((plant: Plant) => ( 
           <View key={plant.id} style={styles.plantCard}>
             <Text style={styles.plantName}>{plant.name}</Text>
@@ -66,7 +68,13 @@ const PlantPage: React.FC = () => {
             )}
           </View>
         ))}
+      </View> */}
+      <View style={[styles.plantsContainer, isWideScreen && styles.plantsRow]}>
+        {plants.map((plant) => (
+          <PlantCard key={plant.id} plant={plant} isWideScreen={isWideScreen} />
+        ))}
       </View>
+    
 
     </ScrollView>
   );
@@ -75,18 +83,35 @@ const PlantPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f1f1f1',
     paddingVertical: 20,
     flexGrow: 1,
-    borderRadius: 12,
-    padding: 15,
-    marginVertical: 10,
+    paddingHorizontal: 10,
+  },
+  largeContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 180,
+  },
+  title: {
+    fontSize: 20,
+    color: '#78B494',
+    marginTop: 20,
+  },
+  subtitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#0F5A32',
+    marginBottom: 20 ,
+  },
+  plantsContainer: {
+    flexDirection: 'column',
     width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    alignItems: 'center',
+  },
+  plantsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Alinea tarjetas a la derecha
+    flexWrap: 'wrap',
   },
   loaderContainer: {
     flex: 1,
@@ -106,39 +131,6 @@ const styles = StyleSheet.create({
     color: '#721c24',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  plantsContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-  },
-  plantCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    width: '90%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  plantName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#343a40',
-    marginBottom: 5,
-  },
-  plantDescription: {
-    fontSize: 14,
-    color: '#6c757d',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#495057',
-    marginBottom: 20,
   },
 });
 
