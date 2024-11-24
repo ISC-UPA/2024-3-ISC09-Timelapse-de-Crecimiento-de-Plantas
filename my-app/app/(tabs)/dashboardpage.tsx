@@ -4,7 +4,8 @@ import { useQuery } from '@apollo/client';
 import ChartWidget from '../../components/ChartWidget';
 import { GET_MEASUREMENTS,Measurement } from '@/api/queries/queryMeasurements';
 import { apiKey, endpoint } from '@/api/chatGpt/chatConfig';
-
+import DataTable from '@/components/DataTable';
+import Recommendations from '@/components/Recommendation';
 
 //se crea una funcion que retorna el inicio y fin del dia actual
 const  getDayStartAndEnd =()=> {
@@ -39,14 +40,14 @@ const DashboardScreen: React.FC = () => {
         where: {
           plant: {
             id: {//aqui deberia de venir el codigo de la planta seleccionada
-              equals: "cm2v83y5c00007664w4dvdgx9" // codigo de planta
+              equals: "cm3ustdfq00003v36lqco3zht" // codigo de planta
             }
           },
           AND: [
             {//aqui se pone el rango de fechas que viene de la funcion getDayStartAndEnd
               date_add: {
-                gt: "2024-11-11T00:00:00.000Z",
-                lt: "2024-11-22T00:00:00.000Z"
+                gt: startOfDay,
+                lt: endOfDay,
               }
             }
           ]
@@ -100,9 +101,9 @@ const DashboardScreen: React.FC = () => {
   
     // Construcción dinámica del contenido del prompt
     const promptContent = `
-      tengo una planta de ${planta} y estas son las mediciones de luz, humedad y temperatura junto con la hora tomada de mi invernadero:
+      I have a plant ${planta} and these are the light, humidity and temperature measurements along with the time taken from my greenhouse:
       ${mediciones}
-      ¿Qué consejo me das para su cuidado?
+      What advice do you have for its care?
     `;
   
     // Configuración de la solicitud
@@ -143,10 +144,25 @@ const DashboardScreen: React.FC = () => {
   };
 
 obtenerConsejo();
-
- 
-
 // Llamar a la función
+
+
+    // Función para calcular el promedio de un array de números
+    const calculateAverage = (values: number[]) => {
+      const sum = values.reduce((acc, value) => acc + value, 0);
+      return sum / values.length;
+    };
+
+    // Extraemos los valores de luz, humedad y temperatura
+    const lightValues = data.measurements.map((measurement:Measurement) => measurement.light);
+    const humidityValues = data.measurements.map((measurement:Measurement ) => measurement.humidity);
+    const temperatureValues = data.measurements.map((measurement:Measurement) => measurement.temperature);
+
+    // Calculamos los promedios
+    const averageLight = calculateAverage(lightValues);
+    const averageHumidity = calculateAverage(humidityValues);
+    const averageTemperature = calculateAverage(temperatureValues);
+
 
  
 
@@ -158,44 +174,24 @@ obtenerConsejo();
 
         <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
          
-          <ChartWidget title="Temperature" value="127,425" data={dataTempetarure} color="#78B494" />
-          <ChartWidget title="Humidity" value="21.8%" data={dataHumidity} color="#4B966E" />
-          <ChartWidget title="Light" value="05:34" data={dataLight} color="#28784D" />
-        
+          <ChartWidget title="Temperature" value={averageLight.toFixed(2) + 'lx'} data={dataTempetarure} color="#78B494" />
+          <ChartWidget title="Humidity" value={averageHumidity.toFixed(2) + '%'} data={dataHumidity} color="#4B966E" />
+          <ChartWidget title="Light" value={averageTemperature.toFixed(2) + ' °C'} data={dataLight} color="#28784D" />
+
         </View>
-        <ScrollView style={styles.tableContainer}  >
-      <table style={styles.table}>
-            <tr>
-              <th>Light</th>
-              <th>Humidity</th>
-              <th>Temperature</th>
-            </tr>
-        {data.measurements.map((measurement: Measurement) => (
-          <React.Fragment >
-         
-            <tr>
-              <td>{measurement.light}</td>
-              <td>{measurement.humidity}</td>
-              <td>{measurement.temperature}</td>
-            </tr>
-          </React.Fragment>
-        ))}
-      </table>
+  
+        <Recommendations planta="Rosas" message={mesage} usuario='Fernanda' />
 
-      </ScrollView>
+        <DataTable measurements={data.measurements} /> 
 
-        
-      
-      <ScrollView  >
-        <p> {mesage} </p>
-      </ScrollView>
+
      
-      
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  //EStilos de la página
   container: {
     backgroundColor: '#f1f1f1',
     paddingVertical: 20,
@@ -208,11 +204,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', // En pantallas grandes, alinea hacia la izquierda
     paddingHorizontal: 180,
   },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   title: {
     fontSize: 20,
     color: '#78B494',
@@ -224,25 +215,18 @@ const styles = StyleSheet.create({
     color: '#0F5A32',
     marginBottom: 20,
   },
-  tableContainer: {   
-    height: 150,
-    width: 300,
-    borderWidth: 1,
-    backgroundColor: '#0F5A32',
-    borderColor: '#000',
-    overflow: 'scroll',},
-
-  table: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#000',
-    backgroundColor: '#fff',
-    overflow: 'scroll',
+  //EStilo del loader container
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+
+  //EStilos de las gráficas
   widgetsContainer: {
     flexDirection: 'column', // Por defecto, organiza en columna
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   widgetsRow: {
     flexDirection: 'row', // En pantallas grandes, organiza en fila
