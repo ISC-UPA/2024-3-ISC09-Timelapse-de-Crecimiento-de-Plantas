@@ -6,6 +6,8 @@ import { GET_MEASUREMENTS,Measurement } from '@/api/queries/queryMeasurements';
 import { apiKey, endpoint } from '@/api/chatGpt/chatConfig';
 import DataTable from '@/components/DataTable';
 import Recommendations from '@/components/Recommendation';
+import UserInfo from '../../components/userinfo'; // Importa el componente UserInfo
+
 
 //se crea una funcion que retorna el inicio y fin del dia actual
 const  getDayStartAndEnd =()=> {
@@ -171,6 +173,9 @@ obtenerConsejo();
       
       <Text style={styles.title}>Overview</Text>
       <Text style={styles.dashboardTitle}>Dashboard</Text>
+      
+      {/* Agregar UserInfo */}
+      <UserInfo />
 
         <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
          
