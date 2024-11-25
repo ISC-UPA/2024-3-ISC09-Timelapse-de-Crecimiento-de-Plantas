@@ -30,7 +30,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="dashboardpage"
+          name="plants/dashboard"
           options={{
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon

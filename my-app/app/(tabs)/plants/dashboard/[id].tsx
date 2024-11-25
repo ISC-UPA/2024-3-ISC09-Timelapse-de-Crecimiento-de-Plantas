@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useQuery } from '@apollo/client';
-import ChartWidget from '../../components/ChartWidget';
+import ChartWidget from '@/components/ChartWidget';
 import { GET_MEASUREMENTS,Measurement } from '@/api/queries/queryMeasurements';
 import { apiKey, endpoint } from '@/api/chatGpt/chatConfig';
 import DataTable from '@/components/DataTable';
 import Recommendations from '@/components/Recommendation';
 import UserInfo from '@/components/UserInfo';
+import { useLocalSearchParams } from 'expo-router';
 
+const { id } = useLocalSearchParams();
 //se crea una funcion que retorna el inicio y fin del dia actual
 const  getDayStartAndEnd =()=> {
   const now = new Date();
@@ -32,6 +34,8 @@ const DashboardScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 1024;
 
+  const params = useLocalSearchParams();
+  console.log(params);
 
   const { startOfDay, endOfDay } = getDayStartAndEnd();
   const [mesage,setMesage] = React.useState("");
@@ -41,7 +45,7 @@ const DashboardScreen: React.FC = () => {
         where: {
           plant: {
             id: {//aqui deberia de venir el codigo de la planta seleccionada
-              equals: "cm3ustdfq00003v36lqco3zht" // codigo de planta
+              equals: params.id // codigo de planta
             }
           },
           AND: [
