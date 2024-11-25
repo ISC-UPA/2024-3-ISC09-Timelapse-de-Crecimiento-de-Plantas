@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import PlantCard from '@/components/PlantCard';
 import { GET_PLANTS ,Plant } from '@/api/queries/queryPlants';
+import { Link } from 'expo-router';
+
 
 // Define la interfaz para el tipo de plant
 
@@ -59,7 +61,12 @@ const PlantPage: React.FC = () => {
       
       <View style={[styles.plantsContainer, isWideScreen && styles.plantsRow]}>
         {plants.map((plant) => (
-          <PlantCard key={plant.id} plant={plant} isWideScreen={isWideScreen} />
+          <Link
+            key={plant.id}
+            href={{ pathname: '/plants/dashboard/[id]', params: { id: plant.id } }}  // Ruta dinámica
+          >
+            <PlantCard plant={plant} isWideScreen={isWideScreen} />
+          </Link>
         ))}
       </View>
 
