@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import PlantCard from '@/components/PlantCard';
 import { GET_PLANTS ,Plant } from '@/api/queries/queryPlants';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 
 
 // Define la interfaz para el tipo de plant
@@ -20,16 +20,19 @@ const PlantPage: React.FC = () => {
 
   const { width } = useWindowDimensions();
   const isWideScreen = width > 1024; // Determina si está en pantalla grande
+  const iddevice = useLocalSearchParams();
+
 
   const { data, loading, error } = useQuery(GET_PLANTS, {
     variables: {
       where: {
         device: {
           id: {
-            equals: 'cm3usu7ko00013v36s97yrq9n',//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
+            equals: iddevice.id,//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
           },
         },
       },
+      skip:!iddevice
     },
   });
 
@@ -129,4 +132,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PlantPage;
+export default PlantPage; 

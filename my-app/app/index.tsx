@@ -103,7 +103,11 @@ export default function LoginPage() {
           console.log('Datos del usuario guardados correctamente');
 
           // Redirigir al usuario a /dashboardpage
-          router.push('/dashboardpage'); // Cambia esta línea para hacer la redirección
+          const iddevice = 'cm3usu7ko00013v36s97yrq9n'; // ID fijo o dinámico según tu lógica
+          router.push({
+            pathname: '/(tabs)/plants/[id]',
+            params: { id: iddevice }, // Pasa el parámetro iddevice como "id"
+          });
         } else {
           console.error('No se pudo decodificar el token');
         }
@@ -111,6 +115,7 @@ export default function LoginPage() {
         console.error('Error al guardar los datos del usuario', error);
       }
     }
+
   };
 
   const handleSignOut = async () => {
