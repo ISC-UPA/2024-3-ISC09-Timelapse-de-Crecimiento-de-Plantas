@@ -7,5 +7,11 @@ export default config({
     url: 'file:./db/vivePlanta.db',
   },
   lists,
+  server: {
+    cors: {
+      origin: '*', // Permitir todos los orígenes
+      credentials: true, // Habilitar el uso de credenciales (para cookies o tokens)
+    },
+  },
   //session,
 });

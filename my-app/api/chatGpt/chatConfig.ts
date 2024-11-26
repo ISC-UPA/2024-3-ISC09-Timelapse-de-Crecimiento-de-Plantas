@@ -1,0 +1,2 @@
+export const endpoint = "https://iaupa.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-08-01-preview";
+export const apiKey = "6eJNQvRDjTLvXVW1zboParee2ni5vOCk7D8VDwyDIKFfCWHmLRkjJQQJ99AKACYeBjFXJ3w3AAABACOGRhYA";

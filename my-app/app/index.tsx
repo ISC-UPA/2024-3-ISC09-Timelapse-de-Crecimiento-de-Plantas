@@ -9,12 +9,14 @@ import {
 import { Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View, Platform, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createStyles from './styles/loginpage'; // Importa los estilos dinámicos
+import { useRouter } from 'expo-router'; // Importa useRouter
 
 WebBrowser.maybeCompleteAuthSession();
 
 const { width, height } = Dimensions.get('window'); // Obtiene las dimensiones de la pantalla
 
-export default function App() {
+export default function LoginPage() {
+  const router = useRouter(); // Inicializa el hook de navegación
   const colorScheme = useColorScheme(); // Detecta el tema claro u oscuro
   const styles = createStyles(colorScheme || 'light'); // Aplica los estilos según el tema
 
@@ -99,6 +101,9 @@ export default function App() {
             ['username', username],
           ]);
           console.log('Datos del usuario guardados correctamente');
+
+          // Redirigir al usuario a /dashboardpage
+          router.push('/dashboardpage'); // Cambia esta línea para hacer la redirección
         } else {
           console.error('No se pudo decodificar el token');
         }
@@ -141,14 +146,10 @@ export default function App() {
                   source={require('../assets/images/microsoft.png')}
                   style={[styles.buttonImage, { width: 24, height: 24 }]} 
                 />
-                <Text style={[styles.buttonText, Platform.OS === 'web' ? { fontSize: 14 } : { fontSize: 12 }]}>
-                  {token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}
-                </Text>
+                <Text style={[styles.buttonText, Platform.OS === 'web' ? { fontSize: 14 } : { fontSize: 12 }]}>{token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}</Text>
               </View>
             </TouchableOpacity>
-            <Text style={styles.loginMessage}>
-              {token ? 'Sesión iniciada' : 'Por favor, inicia sesión'}
-            </Text>
+            <Text style={styles.loginMessage}>{token ? 'Sesión iniciada' : 'Por favor, inicia sesión'}</Text>
           </View>
         </View>
       )}
