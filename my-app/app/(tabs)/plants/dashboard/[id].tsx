@@ -182,9 +182,9 @@ obtenerConsejo();
 
         <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
          
-          <ChartWidget title="Temperature" value={averageLight.toFixed(2) + 'lx'} data={dataTempetarure} color="#78B494" />
+          <ChartWidget title="Temperature" value={averageLight.toFixed(2) + '°C'} data={dataTempetarure} color="#78B494" />
           <ChartWidget title="Humidity" value={averageHumidity.toFixed(2) + '%'} data={dataHumidity} color="#4B966E" />
-          <ChartWidget title="Light" value={averageTemperature.toFixed(2) + ' °C'} data={dataLight} color="#28784D" />
+          <ChartWidget title="Light" value={averageTemperature.toFixed(2) + 'LX'} data={dataLight} color="#28784D" />
 
         </View>
   
