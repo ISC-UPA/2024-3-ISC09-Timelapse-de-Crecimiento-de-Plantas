@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   largeContainer: {
     alignItems: 'center', // En pantallas grandes, alinea hacia la izquierda
-    paddingHorizontal: 180,
+    paddingHorizontal: '20%',
   },
   title: {
     fontSize: 20,
@@ -243,6 +243,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // En pantallas grandes, organiza en fila
     justifyContent: 'center', // Alinea hacia la derecha
     flexWrap: 'wrap',
+    width: '100%',
   },
   backButton: {
     position: 'absolute',
