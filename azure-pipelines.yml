@@ -1,0 +1,45 @@
+trigger:
+- main
+
+resources:
+- repo: self
+
+pool:
+  name: 'Default'
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build and Push Docker Image
+  jobs:
+  - job: Build
+    displayName: Build api
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'plantguardFrontend'
+        command: 'build'
+        Dockerfile: '**/my-app/Dockerfile'
+        arguments: '-t plantguardfrontend.azurecr.io/frontend:latest'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'plantguardFrontend'
+        repository: 'frontend'
+        command: 'push'
+        tags: 'latest'
+
+- stage: Deploy
+  displayName: Deploy to Azure Web
+  dependsOn: Build
+  jobs:
+  - job: Deploy
+    displayName: Deploy
+    steps:    
+    - task: AzureWebAppContainer@1
+      inputs:
+        azureSubscription: 'Azure for Students(4ef80bf2-b321-4f66-a8ae-347f55ec2455)'
+        appName: 'PlantGuard'
+        containers: 'plantguardfrontend.azurecr.io/frontend:latest'
+        appSettings: '-Port 8081 -RequestTimeout 6000'
