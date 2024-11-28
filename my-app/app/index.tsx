@@ -7,7 +7,6 @@ import {
   useAutoDiscovery,
 } from 'expo-auth-session';
 import { Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View, Platform, Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import createStyles from './styles/loginpage'; // Importa los estilos dinámicos
 import { useRouter } from 'expo-router'; // Importa useRouter
 
@@ -28,6 +27,7 @@ export default function LoginPage() {
   const redirectUri = makeRedirectUri({ scheme: 'myapp', path: '' });
   const clientId = 'b6003d17-274d-46dd-87fc-ee9633ef41b0';
 
+
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Para indicar si estamos verificando el token al inicio
 
@@ -42,8 +42,8 @@ export default function LoginPage() {
   );
 
   useEffect(() => {
-    const loadToken = async () => {
-      const savedToken = await AsyncStorage.getItem('accessToken');
+    const loadToken = () => {
+      const savedToken = localStorage.getItem('accessToken');
       if (savedToken) {
         setToken(savedToken);
       }
@@ -91,15 +91,14 @@ export default function LoginPage() {
           const email = decoded.email || '';
           const username = email.split('@')[0]; // Usa la parte local del correo como nombre de usuario
 
-          // Guardar en AsyncStorage
-          await AsyncStorage.multiSet([
-            ['accessToken', res.accessToken],
-            ['refreshToken', res.refreshToken ?? ''],
-            ['expiresIn', res.expiresIn?.toString() || ''],
-            ['issuedAt', res.issuedAt.toString()],
-            ['email', email],
-            ['username', username],
-          ]);
+          // Guardar en localStorage
+          localStorage.setItem('accessToken', res.accessToken);
+          localStorage.setItem('refreshToken', res.refreshToken ?? '');
+          localStorage.setItem('expiresIn', res.expiresIn?.toString() || '');
+          localStorage.setItem('issuedAt', res.issuedAt.toString());
+          localStorage.setItem('email', email);
+          localStorage.setItem('username', username);
+
           console.log('Datos del usuario guardados correctamente');
 
           // Redirigir al usuario a /dashboardpage
@@ -115,16 +114,20 @@ export default function LoginPage() {
         console.error('Error al guardar los datos del usuario', error);
       }
     }
-
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     try {
-      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'expiresIn', 'issuedAt', 'email', 'username']);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('expiresIn');
+      localStorage.removeItem('issuedAt');
+      localStorage.removeItem('email');
+      localStorage.removeItem('username');
       setToken(null);
       console.log('Sesión cerrada y tokens eliminados');
     } catch (error) {
-      console.error('Error al eliminar el token de AsyncStorage', error);
+      console.error('Error al eliminar el token de localStorage', error);
     }
   };
 

@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery } from '@apollo/client';
+import React, { useEffect, useState } from 'react';
+import { useQuery,useLazyQuery } from '@apollo/client';
 import {
   View,
   Text,
@@ -9,31 +9,104 @@ import {
   useWindowDimensions,
   TouchableOpacity,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlantCard from '@/components/PlantCard';
 import { GET_PLANTS, Plant } from '@/api/queries/queryPlants';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // Importa los íconos de Expo
+import { GET_USER, User } from '@/api/queries/queryUser';
 
 const PlantPage: React.FC = () => {
+
+
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const isWideScreen = width > 1024; // Determina si está en pantalla grande
-  const iddevice = useLocalSearchParams();
-  const router = useRouter(); // Hook para manejar navegación
 
+  const [email, setEmail] = useState<string | null>(localStorage.getItem('email'));
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+  const [userDeviceId, setUserDeviceId] = useState<string | null>(null);
+  const [getUser,  { data: userData, loading: userLoading, error: userError }] = useLazyQuery(GET_USER);
+  
+
+  // Obtiene el email almacenado en AsyncStorage
+  //useEffect(() => {
+//
+//
+  //  const loadEmail = async () => {
+  //    try {
+  //      const storedEmail = await localStorage.getItem('email');
+  //      //const storedEmail="false"
+  //      console.log('Correo cargado desde localStorage:', storedEmail);
+  //      setEmail(storedEmail);
+  //    } catch (err) {
+  //      console.error('Error al cargar el email:', err);
+  //    }
+  //  };
+  //  loadEmail();
+ //
+  //}, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (email) {
+        console.log('Ejecutando consulta con email:', email);
+        getUser({ variables: { where: { email:email } } });
+      }else {
+      
+        router.replace('/access-denied');
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Query para obtener datos del usuario basado en el email
+  //const { data: userData, loading: userLoading, error: userError } = useQuery<{ guestUser: User }>(GET_USER, {
+  //  skip: !email, // Solo ejecutar si hay email
+  //  variables: { where: { email } },
+  //});
+
+ 
+
+
+
+  // Verificación de usuario y autorización
+  useEffect(() => {
+    if (userLoading || userError) return; // Evita redirecciones prematuras mientras carga o si hay error
+    if (userData?.guestUser) {
+      const user = userData.guestUser;
+      console.log('Datos del usuario:', user);
+
+      // Establece el ID del dispositivo y la autorización
+      setUserDeviceId(user.device.id);
+      setIsAuthorized(true);
+
+      // Redirige al ID del dispositivo
+      router.push(`/plants/${user.device.id}`);
+    } else {
+      console.log('Acceso denegado: usuario no encontrado.');
+
+      // Reemplaza la URL actual si no está autorizado
+      router.replace('/access-denied');
+    }
+  }, [userLoading, userError, userData, setUserDeviceId, setIsAuthorized, router]);
+
+  // Query para obtener las plantas del dispositivo
   const { data, loading, error } = useQuery(GET_PLANTS, {
+    skip: !isAuthorized || !userDeviceId, // Ejecutar solo si está autorizado y tiene dispositivo
     variables: {
       where: {
         device: {
           id: {
-            equals: iddevice.id, // Id del dispositivo al que están asignadas las plantas
+            equals: userDeviceId,
           },
         },
       },
-      skip: !iddevice,
     },
   });
 
-  if (loading) {
+  // Renderizado del componente
+  if (userLoading || loading) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#78B494" />
@@ -119,7 +192,7 @@ const styles = StyleSheet.create({
   },
   plantsRow: {
     flexDirection: 'row',
-    justifyContent: 'center', // Alinea tarjetas a la derecha
+    justifyContent: 'center',
     flexWrap: 'wrap',
   },
   loaderContainer: {
