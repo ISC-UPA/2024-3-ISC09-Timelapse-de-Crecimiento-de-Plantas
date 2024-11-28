@@ -9,27 +9,48 @@ import {
 import { Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View, Platform, Dimensions } from 'react-native';
 import createStyles from './styles/loginpage'; // Importa los estilos dinámicos
 import { useRouter } from 'expo-router'; // Importa useRouter
+import { useLazyQuery } from '@apollo/client';
+import { GET_USER,User } from '@/api/queries/queryUser';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const { width, height } = Dimensions.get('window'); // Obtiene las dimensiones de la pantalla
 
 export default function LoginPage() {
-  const router = useRouter(); // Inicializa el hook de navegación
-  const colorScheme = useColorScheme(); // Detecta el tema claro u oscuro
-  const styles = createStyles(colorScheme || 'light'); // Aplica los estilos según el tema
+  const router = useRouter();
+  const colorScheme = useColorScheme();
+  const styles = createStyles(colorScheme || 'light');
+  const [email, setEmail] = useState<string | null>(null);
+  const [getUser] = useLazyQuery(GET_USER, {
+    onCompleted: (result:any) => {
+     // console.log('Datos obtenidos:', result.guestUser);
+
+      if (result?.guestUser) {
+        console.log('Datos obtenidos:', result.guestUser.name);
+        localStorage.setItem('device', result.guestUser. device.id);
+        localStorage.setItem('username', result.guestUser. name);
+        const iddevice = result.guestUser.device.id;
+        router.push({
+          pathname: '/(tabs)/plants/[id]',
+          params: { id: iddevice },
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('Error al ejecutar la consulta:', error);
+    },
+  });
 
   const discovery = useAutoDiscovery(
-    'https://login.microsoftonline.com/2803e296-cffb-471f-a4b5-988a45052db6/v2.0'
+    'https://login.microsoftonline.com/common/v2.0'
   );
-  const tokenEndpoint = 'https://login.microsoftonline.com/2803e296-cffb-471f-a4b5-988a45052db6/oauth2/v2.0/token';
 
+  const tokenEndpoint = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
   const redirectUri = makeRedirectUri({ scheme: 'myapp', path: '' });
   const clientId = 'b6003d17-274d-46dd-87fc-ee9633ef41b0';
 
-
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Para indicar si estamos verificando el token al inicio
+  const [isLoading, setIsLoading] = useState(true);
 
   const [request, , promptAsync] = useAuthRequest(
     {
@@ -40,6 +61,16 @@ export default function LoginPage() {
     },
     discovery
   );
+
+
+  const fetchUser = async (email: string) => {
+    if (email) {
+      console.log('Ejecutando consulta con email:', email);
+      getUser({ variables: { where: { email } } });
+    } else {
+      router.replace('/access-denied');
+    }
+  };
 
   useEffect(() => {
     const loadToken = () => {
@@ -52,17 +83,18 @@ export default function LoginPage() {
     loadToken();
   }, []);
 
+
   const decodeJwt = (token: string) => {
     try {
-      const base64Url = token.split('.')[1]; // Extrae la parte del payload
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Convierte a base64 estándar
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split('')
           .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
           .join('')
       );
-      return JSON.parse(jsonPayload); // Devuelve el payload decodificado como objeto
+      return JSON.parse(jsonPayload);
     } catch (error) {
       console.error('Error al decodificar el token', error);
       return null;
@@ -85,13 +117,11 @@ export default function LoginPage() {
       setToken(res.accessToken);
 
       try {
-        // Decodificar el token para obtener la información del usuario
         const decoded = decodeJwt(res.idToken);
         if (decoded) {
-          const email = decoded.email || '';
-          const username = email.split('@')[0]; // Usa la parte local del correo como nombre de usuario
+          let email = decoded.email || '';
+          const username = email.split('@')[0];
 
-          // Guardar en localStorage
           localStorage.setItem('accessToken', res.accessToken);
           localStorage.setItem('refreshToken', res.refreshToken ?? '');
           localStorage.setItem('expiresIn', res.expiresIn?.toString() || '');
@@ -100,13 +130,8 @@ export default function LoginPage() {
           localStorage.setItem('username', username);
 
           console.log('Datos del usuario guardados correctamente');
-
-          // Redirigir al usuario a /dashboardpage
-          const iddevice = 'cm3usu7ko00013v36s97yrq9n'; // ID fijo o dinámico según tu lógica
-          router.push({
-            pathname: '/(tabs)/plants/[id]',
-            params: { id: iddevice }, // Pasa el parámetro iddevice como "id"
-          });
+          getUser({ variables: { where: { email:email } } });
+  
         } else {
           console.error('No se pudo decodificar el token');
         }
@@ -130,6 +155,7 @@ export default function LoginPage() {
       console.error('Error al eliminar el token de localStorage', error);
     }
   };
+
 
   return (
     <SafeAreaView style={styles.container}>
