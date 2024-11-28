@@ -6,33 +6,30 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  Dimensions,
-  useWindowDimensions, 
+  useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
 import PlantCard from '@/components/PlantCard';
-import { GET_PLANTS ,Plant } from '@/api/queries/queryPlants';
-import { Link, useLocalSearchParams } from 'expo-router';
-
-
-// Define la interfaz para el tipo de plant
+import { GET_PLANTS, Plant } from '@/api/queries/queryPlants';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; // Importa los íconos de Expo
 
 const PlantPage: React.FC = () => {
-
   const { width } = useWindowDimensions();
   const isWideScreen = width > 1024; // Determina si está en pantalla grande
   const iddevice = useLocalSearchParams();
-
+  const router = useRouter(); // Hook para manejar navegación
 
   const { data, loading, error } = useQuery(GET_PLANTS, {
     variables: {
       where: {
         device: {
           id: {
-            equals: iddevice.id,//Id del dispositivo al que esta asignada las plantas que regresara la pericion 
+            equals: iddevice.id, // Id del dispositivo al que están asignadas las plantas
           },
         },
       },
-      skip:!iddevice
+      skip: !iddevice,
     },
   });
 
@@ -56,23 +53,24 @@ const PlantPage: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={[styles.container, isWideScreen && styles.largeContainer]}>
-        <Text style={styles.title}>Plants</Text>
-        <Text style={styles.subtitle}>Choose a plant</Text>
-     {
-        ///recorre el array de plants tipando cada elemento con la interface platas declarada arriba
-     } 
-      
+      {/* Ícono de flecha para volver */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#78B494" />
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Plants</Text>
+      <Text style={styles.subtitle}>Choose a plant</Text>
+
       <View style={[styles.plantsContainer, isWideScreen && styles.plantsRow]}>
         {plants.map((plant) => (
           <Link
             key={plant.id}
-            href={{ pathname: '/plants/dashboard/[id]', params: { id: plant.id } }}  // Ruta dinámica
+            href={{ pathname: '/plants/dashboard/[id]', params: { id: plant.id } }} // Ruta dinámica
           >
             <PlantCard plant={plant} isWideScreen={isWideScreen} />
           </Link>
         ))}
       </View>
-
     </ScrollView>
   );
 };
@@ -84,22 +82,35 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     flexGrow: 1,
     paddingHorizontal: 10,
-  
   },
   largeContainer: {
     alignItems: 'center',
     paddingHorizontal: 180,
   },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 50,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 2, // Para sombra en Android
+  },
   title: {
     fontSize: 20,
     color: '#78B494',
-    marginTop: 20,
+    marginTop: 20, // Ajusta para que no se superponga con el botón
   },
   subtitle: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#0F5A32',
-    marginBottom: 20 ,
+    marginBottom: 20,
   },
   plantsContainer: {
     flexDirection: 'column',
@@ -132,4 +143,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PlantPage; 
+export default PlantPage;

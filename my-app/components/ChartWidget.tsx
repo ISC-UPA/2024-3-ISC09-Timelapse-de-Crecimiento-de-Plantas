@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
   widgetTitle: {
     fontSize: 18,
-    color: '#0F5A32',
+    color: '#ffffff',
     fontWeight: '500',
   },
   widgetValue: {

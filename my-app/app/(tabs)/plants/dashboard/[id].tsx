@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { useQuery } from '@apollo/client';
 import ChartWidget from '@/components/ChartWidget';
 import { GET_MEASUREMENTS,Measurement } from '@/api/queries/queryMeasurements';
@@ -8,6 +8,8 @@ import DataTable from '@/components/DataTable';
 import Recommendations from '@/components/Recommendation';
 import UserInfo from '@/components/UserInfo';
 import { useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; // Importa los íconos de Expo
+
 
 const { id } = useLocalSearchParams();
 //se crea una funcion que retorna el inicio y fin del dia actual
@@ -174,11 +176,13 @@ obtenerConsejo();
   return (
     <ScrollView contentContainerStyle={[styles.container, isLargeScreen && styles.largeContainer]}>
       
+      {/* Ícono de flecha para volver */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#78B494" />
+      </TouchableOpacity>
+
       <Text style={styles.title}>Overview</Text>
       <Text style={styles.dashboardTitle}>Dashboard</Text>
-      
-      {/* Agregar UserInfo */}
-      <UserInfo />
 
         <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
          
@@ -240,6 +244,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // En pantallas grandes, organiza en fila
     justifyContent: 'center', // Alinea hacia la derecha
     flexWrap: 'wrap',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 50,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 2, // Para sombra en Android
   },
 
 });

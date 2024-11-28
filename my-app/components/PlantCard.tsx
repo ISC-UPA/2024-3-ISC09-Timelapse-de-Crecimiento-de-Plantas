@@ -30,7 +30,9 @@ const PlantCard: React.FC<PlantCardProps> = ({ plant, isWideScreen }) => {
 
 const styles = StyleSheet.create({
   plantCard: {
+    alignSelf: 'center',
     margin: 10,
+    width: '90%',
     height: 200,
     marginVertical: 10,
     borderRadius: 12,
