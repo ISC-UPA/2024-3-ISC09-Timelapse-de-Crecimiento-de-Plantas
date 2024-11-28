@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   tableHeaderText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 13,
     flex: 1,
     textAlign: 'center',
   },

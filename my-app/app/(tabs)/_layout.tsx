@@ -16,6 +16,8 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           headerShown: false,
+          tabBarStyle: { display: 'none' }, // Aquí ocultamos la barra de navegación inferior
+
         }}
       >
         <Tabs.Screen

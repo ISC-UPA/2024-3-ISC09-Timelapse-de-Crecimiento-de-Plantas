@@ -32,16 +32,11 @@ const styles = StyleSheet.create({
   plantCard: {
     alignSelf: 'center',
     margin: 10,
+    // paddingHorizontal: 5,
     width: '90%',
     height: 200,
-    marginVertical: 10,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
-    overflow: 'hidden',
+    // paddingHorizontal: 10,
+    
   },
   imageBackground: {
     flex: 1,
@@ -49,6 +44,12 @@ const styles = StyleSheet.create({
     height: 'auto',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    overflow: 'hidden',
   },
   plantText: {
     fontSize: 25,

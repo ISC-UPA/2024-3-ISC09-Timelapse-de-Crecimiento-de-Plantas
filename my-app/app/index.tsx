@@ -180,10 +180,11 @@ export default function LoginPage() {
             ]}>
         <Text style={[
               styles.welcomeTitle, {textAlign: isMobile ? 'center' : 'left'}
-              ]} >Welcome to...</Text>
+              ]} >Welcome to PlantGuard! 
+              </Text>
         <Text style={styles.welcomeText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </Text>
+          Explore the world of smart plant care with our intuitive monitoring system. From light and humidity levels to growth tracking, your plants will never have been in better hands.
+         </Text>
       </View>
       <View style={styles.loginSection}>
         <Image

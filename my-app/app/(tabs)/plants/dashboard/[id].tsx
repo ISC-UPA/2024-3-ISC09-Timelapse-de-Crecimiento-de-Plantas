@@ -29,7 +29,8 @@ const DashboardScreen: React.FC = () => {
   const params = useLocalSearchParams();
   const { startOfDay, endOfDay } = getDayStartAndEnd();
   const [mesage, setMesage] = React.useState("");
-  const [isDarkMode, setIsDarkMode] = useState(false); // Estado para manejar el tema oscuro
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
 
   const { data, loading } = useQuery(GET_MEASUREMENTS, {
     variables: {
@@ -56,7 +57,7 @@ const DashboardScreen: React.FC = () => {
   }, [data]);
 
   const obtenerConsejo = async () => {
-    const planta = "rosas";
+    const planta = params.name;
     const mediciones = data.measurements
       .map((measurement: Measurement) => {
         const { date_add, light, temperature, humidity } = measurement;
@@ -64,9 +65,9 @@ const DashboardScreen: React.FC = () => {
       })
       .join("\n");
     const promptContent = `
-      I have a plant ${planta} and these are the light, humidity and temperature measurements along with the time taken from my greenhouse:
+       I have a plant ${planta} and here are the light, humidity, and temperature measurements from my greenhouse:
       ${mediciones}
-      What advice do you have for its care?
+      Provide a brief care recommendation for this plant (keep it short).
     `;
     const headers = {
       "Content-Type": "application/json",
@@ -79,7 +80,7 @@ const DashboardScreen: React.FC = () => {
           content: promptContent,
         },
       ],
-      max_tokens: 300,
+      max_tokens: 150,
     };
     try {
       const response = await fetch(endpoint, {
@@ -166,7 +167,7 @@ const DashboardScreen: React.FC = () => {
         <ChartWidget title="Light" value={averageTemperature.toFixed(2) + ' °C'} data={dataLight} color="#28784D" />
       </View>
 
-      <Recommendations planta="Rosas" message={mesage} usuario="Fernanda" />
+      <Recommendations planta={params.name} message={mesage} usuario={username} />
       <DataTable measurements={data.measurements} />
     </ScrollView>
   );
@@ -228,6 +229,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
+    backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
