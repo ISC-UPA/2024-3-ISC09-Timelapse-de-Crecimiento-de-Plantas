@@ -19,8 +19,6 @@ const { width, height } = Dimensions.get('window'); // Obtiene las dimensiones d
 
 export default function LoginPage() {
   const [isDarkMode, setIsDarkMode] = useState(false); // Estado para alternar entre temas
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Para indicar si estamos verificando el token al inicio
 
   const styles = createStyles(isDarkMode ? 'dark' : 'light'); // Estilos dinámicos según el tema
   const { height, width } = useWindowDimensions(); // Detecta el ancho de la pantalla
