@@ -6,8 +6,7 @@ import { GET_MEASUREMENTS,Measurement } from '@/api/queries/queryMeasurements';
 import { apiKey, endpoint } from '@/api/chatGpt/chatConfig';
 import DataTable from '@/components/DataTable';
 import Recommendations from '@/components/Recommendation';
-import UserInfo from '@/components/UserInfo';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // Importa los íconos de Expo
 
 

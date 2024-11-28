@@ -9,7 +9,6 @@ import {
   useWindowDimensions,
   TouchableOpacity,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlantCard from '@/components/PlantCard';
 import { GET_PLANTS, Plant } from '@/api/queries/queryPlants';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
