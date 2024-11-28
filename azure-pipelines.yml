@@ -5,7 +5,7 @@ resources:
 - repo: self
 
 pool:
-  name: 'Self-Hosted-Pool'
+  name: 'Default'
 
 variables:
   tag: '$(Build.BuildId)'
