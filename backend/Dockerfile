@@ -16,6 +16,9 @@ COPY . .
 # Expone el puerto en el que la aplicación correrá
 EXPOSE 3000
 
+# Construye el backend
+RUN npm run build
+
 # Comando para compilar y correr la aplicación
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
