@@ -14,8 +14,12 @@ RUN npm install
 COPY . .
 
 # Expone el puerto en el que la aplicación correrá
-EXPOSE 3000
+EXPOSE 8081
+
+#Construcción de la aplicación
+
+RUN npm build
 
 # Comando para compilar y correr la aplicación
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]
