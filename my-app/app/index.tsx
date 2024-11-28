@@ -6,7 +6,7 @@ import {
   useAuthRequest,
   useAutoDiscovery,
 } from 'expo-auth-session';
-import { Text, SafeAreaView, TouchableOpacity, Image, View, Platform, Dimensions } from 'react-native';
+import { Text, SafeAreaView, TouchableOpacity, Image, View, Platform, Dimensions, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router'; // Importa useRouter
 import Icon from 'react-native-vector-icons/FontAwesome'; // Para el ícono de modo oscuro/claro
 import createStyles from './styles/loginpage'; // Importa los estilos dinámicos
@@ -22,6 +22,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(true); // Para indicar si estamos verificando el token al inicio
 
   const styles = createStyles(isDarkMode ? 'dark' : 'light'); // Estilos dinámicos según el tema
+  const { height, width } = useWindowDimensions(); // Detecta el ancho de la pantalla
+  const isMobile = width < 768; // Define si es móvil o tablet
 
   const discovery = useAutoDiscovery(
     'https://login.microsoftonline.com/2803e296-cffb-471f-a4b5-988a45052db6/v2.0'
@@ -88,45 +90,60 @@ export default function LoginPage() {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode); // Alternar el modo
   };
+  
 
   return (
-    <SafeAreaView style={styles.container}>
-      {isLoading ? (
-        <Text style={styles.text}>Cargando...</Text>
-      ) : (
-        <View style={styles.loginContainer}>
-          <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>Welcome to...</Text>
-            <Text style={styles.welcomeText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  <SafeAreaView style={styles.container}>
+  {isLoading ? (
+    <Text style={styles.buttonText}>Cargando...</Text>
+  ) : (
+    <View
+      style={[
+        styles.loginContainer,
+        { flexDirection: isMobile ? 'column' : 'row' }, // Cambia orientación según el dispositivo
+      ]}
+    >
+      <View style={[
+              styles.welcomeSection,
+              { height: isMobile ? height * 0.4 : 'auto'},
+              { width: isMobile ? 'auto' : width * 0.5} // Máximo 1/4 de pantalla en computadoras
+            ]}>
+        <Text style={[
+              styles.welcomeTitle, {textAlign: isMobile ? 'center' : 'left'}
+              ]} >Welcome to...</Text>
+        <Text style={styles.welcomeText}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        </Text>
+      </View>
+      <View style={styles.loginSection}>
+        <Image
+          source={require('../assets/images/PlantLogo.jpeg')}
+          style={[styles.logo, Platform.OS === 'web' ? { width: 150, height: 150 } : { width: width * 0.4, height: width * 0.4 }]}
+        />
+        <TouchableOpacity style={styles.microsoftButton} onPress={token ? handleSignOut : handleSignIn}>
+          <View style={styles.buttonContent}>
+            <Image
+              source={require('../assets/images/microsoft.png')}
+              style={[styles.buttonImage, { width: 24, height: 24 }]}
+            />
+            <Text style={[styles.buttonText, Platform.OS === 'web' ? { fontSize: 14 } : { fontSize: 12 }]}>
+              {token ? 'Log out' : 'Log in with Microsoft'}
             </Text>
           </View>
-          <View style={styles.loginSection}>
-            <Image
-              source={require('../assets/images/PlantLogo.jpeg')}
-              style={[styles.logo, Platform.OS === 'web' ? { width: 150, height: 150 } : { width: width * 0.4, height: width * 0.4 }]} 
-            />
-            <TouchableOpacity style={styles.microsoftButton} onPress={token ? handleSignOut : handleSignIn}>
-              <View style={styles.buttonContent}>
-                <Image
-                  source={require('../assets/images/microsoft.png')}
-                  style={[styles.buttonImage, { width: 24, height: 24 }]} 
-                />
-                <Text style={[styles.buttonText, Platform.OS === 'web' ? { fontSize: 14 } : { fontSize: 12 }]}>{token ? 'Log out' : 'Log in with Microsoft'}</Text>
-              </View>
-            </TouchableOpacity>
-            <Text style={styles.loginMessage}>{token ? 'Logged in' : 'Please login'}</Text>
-          </View>
-          <TouchableOpacity style={styles.iconButton} onPress={toggleTheme}>
+        </TouchableOpacity>
+        <Text style={styles.loginMessage}>{token ? 'Logged in' : 'Please login'}</Text>
+      </View>
+      <TouchableOpacity style={styles.iconButton} onPress={toggleTheme}>
             <Icon
               name={isDarkMode ? 'sun-o' : 'moon-o'}
               color={isDarkMode ? '#fff' : '#000'} // Color del ícono
               size={20}
-              style={styles.icon}
             />
           </TouchableOpacity>
-        </View>
-      )}
-    </SafeAreaView>
-  );
+    </View>
+  )}
+</SafeAreaView>
+);
 }
+
+  

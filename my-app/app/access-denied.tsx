@@ -24,7 +24,7 @@ const AccessDeniedScreen: React.FC = () => {
 
   return (
     <View style={[commonStyles.container, themeStyles.container]}>
-      <Logo left={700} top={150} width={150} height={150} />
+      <Logo width={150} height={150}/>
       <Text style={[commonStyles.title, themeStyles.title]}>Access Denied</Text>
       <Text style={[commonStyles.message, themeStyles.message]}>
         You do not have permission to access this section of the application.

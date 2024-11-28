@@ -3,33 +3,32 @@ import { StyleSheet } from 'react-native';
 export default (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
-    backgroundColor: colorScheme === 'light' ? '#F1F1F1' : '#1E1E1E', // Fondo general
+    backgroundColor: colorScheme === 'light' ? '#F1F1F1' : '#1E1E1E',
   },
   loginContainer: {
     flex: 1,
-    flexDirection: 'row',
   },
   welcomeSection: {
-    flex: 1,
-    backgroundColor: colorScheme === 'light' ? '#28784D' : '#333333', // Fondo de bienvenida
+    // flex: 1,
+    
+    backgroundColor: colorScheme === 'light' ? '#28784D' : '#333333',
     justifyContent: 'center',
     padding: 30,
   },
   welcomeTitle: {
-    color: colorScheme === 'light' ? '#FFFFFF' : '#F1F1F1', // Título en blanco o gris claro
+    color: '#FFFFFF',
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   welcomeText: {
-    color: colorScheme === 'light' ? '#D0FDD7' : '#B0B0B0', // Texto en color claro o gris
+    color: '#D0FDD7',
     fontSize: 16,
     lineHeight: 24,
   },
   loginSection: {
     flex: 1,
-    backgroundColor: colorScheme === 'light' ? '#FFFFFF' : '#2A2A2A', // Fondo de la sección de inicio de sesión
+    backgroundColor: colorScheme === 'light' ? '#FFFFFF' : '#2A2A2A',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
@@ -43,8 +42,7 @@ export default (colorScheme: 'light' | 'dark') => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colorScheme === 'light' ? '#64C27B' : '#3D7F4C', // Color del botón
-    paddingVertical: 12,
+    backgroundColor: colorScheme  === 'light' ? '#78B494' : '#4B966E',    paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 5,
     width: '100%',
@@ -60,31 +58,22 @@ export default (colorScheme: 'light' | 'dark') => StyleSheet.create({
     marginRight: 10,
   },
   buttonText: {
-    color: '#FFFFFF', // Texto del botón en blanco para contraste
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
   loginMessage: {
     marginTop: 20,
     fontSize: 16,
-    color: colorScheme === 'light' ? '#2A8C4A' : '#A1C9A1', // Mensaje de login en verde oscuro o más claro en modo oscuro
-  },
-  icon: {
-    // tintColor: colorScheme === 'light' ? '#0000' : '#ffffff', // Color del ícono según el esquema de color
+    color: colorScheme === 'light' ? '#2A8C4A' : '#A1C9A1',
   },
   iconButton: {
     position: 'absolute',
-    top: 0,
+    top: 20,
     left: 10,
-    backgroundColor: '#78B494', 
-    // flexDirection: 'row',
-    // alignItems: 'center',
-    marginTop: 20,
+    backgroundColor: colorScheme  === 'light' ? '#78B494' : '#4B966E',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
   },
-  
-  
-  
 });
