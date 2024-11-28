@@ -70,6 +70,23 @@ const PlantPage: React.FC = () => {
 
   const plants: Plant[] = data?.plants || [];
 
+  // Verifica si no hay plantas
+  if (plants.length === 0) {
+    return (
+      <View style={dynamicStyles.container}>
+        <View style={dynamicStyles.noPlantsContainer}>
+        <Text style={dynamicStyles.noPlantsMessage}>No plants available for this device.</Text>
+        <TouchableOpacity
+            style={dynamicStyles.goBackButton}
+            onPress={() => router.push('/')}
+          >
+            <Text style={dynamicStyles.goBackButtonText}>Back to login</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={[dynamicStyles.container, isWideScreen && dynamicStyles.largeContainer]}>
       {/* Botón para alternar tema */}
@@ -173,6 +190,28 @@ const getStyles = (isDarkMode: boolean) =>
     icon: {
       fontSize: 20,
     },
+    noPlantsMessage: {
+      fontSize: 18,
+      color: isDarkMode ? '#fff' : '#000',
+      textAlign: 'center',
+      marginTop: 20,
+    },
+    noPlantsContainer: {
+      flex: 1,
+      justifyContent: 'center',
+    },
+    goBackButton: {
+      marginTop: 20,
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      backgroundColor: '#78B494',
+      borderRadius: 5,
+    },
+    goBackButtonText: {
+      fontSize: 16,
+      color: '#fff',
+      textAlign: 'center',
+    }
   });
 
 export default PlantPage;

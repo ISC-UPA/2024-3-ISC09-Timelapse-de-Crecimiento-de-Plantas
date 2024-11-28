@@ -28,7 +28,7 @@ const DashboardScreen: React.FC = () => {
   const isLargeScreen = width > 1024;
   const params = useLocalSearchParams();
   const { startOfDay, endOfDay } = getDayStartAndEnd();
-  const [mesage, setMesage] = React.useState("");
+  const [message, setMessage] = React.useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
 
@@ -90,7 +90,7 @@ const DashboardScreen: React.FC = () => {
       });
       if (response.ok) {
         const responseData = await response.json();
-        setMesage(responseData.choices[0].message.content);
+        setMessage(responseData.choices[0].message.content);
       }
     } catch (error) {
       console.error("Error en la solicitud:", error);
@@ -101,10 +101,25 @@ const DashboardScreen: React.FC = () => {
     setIsDarkMode(!isDarkMode); // Cambiar entre los temas
   };
 
+  // Verificar si no hay datos de mediciones
+  const noDataAvailable = !data || !data.measurements || data.measurements.length === 0;
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#78B494" />
+      </View>
+    );
+  }
+
+  // Si no hay datos disponibles, mostrar mensaje y botón de login
+  if (noDataAvailable) {
+    return (
+      <View style={styles.noDataContainer}>
+        <Text style={styles.noDataText}>No measurements available for this plant</Text>
+        <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/')}>
+          <Text style={styles.loginButtonText}>Back to login</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -143,11 +158,11 @@ const DashboardScreen: React.FC = () => {
       <TouchableOpacity 
       style={[styles.backButton, isDarkMode && styles.darkBackButton]} 
       onPress={() => router.back()}>
-      <Ionicons 
-        name="arrow-back" 
-        size={20} 
-        color={isDarkMode ? "#fff" : "#78B494"} // Flecha blanca en modo oscuro
-      />
+        <Ionicons 
+          name="arrow-back" 
+          size={20} 
+          color={isDarkMode ? "#fff" : "#78B494"} // Flecha blanca en modo oscuro
+        />
       </TouchableOpacity>
       <TouchableOpacity style={[styles.iconButton, isDarkMode && styles.darkIconButton]} onPress={toggleTheme}>
         <Icon
@@ -167,7 +182,7 @@ const DashboardScreen: React.FC = () => {
         <ChartWidget title="Light" value={averageTemperature.toFixed(2) + ' °C'} data={dataLight} color="#28784D" />
       </View>
 
-      <Recommendations planta={params.name} message={mesage} usuario={username} />
+      <Recommendations planta={params.name} message={message} usuario={username} />
       <DataTable measurements={data.measurements} />
     </ScrollView>
   );
@@ -226,36 +241,40 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     zIndex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 2,
+  },
+  darkBackButton: {
+    backgroundColor: '#333',
   },
   iconButton: {
     position: 'absolute',
     top: 20,
     right: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    zIndex: 1,
-    backgroundColor: '#fff',
   },
-  darkIconButton:{
-    backgroundColor: '#000'
-    
-  }
-  ,
+  darkIconButton: {
+    backgroundColor: '#333',
+  },
   icon: {
-    fontSize: 20,
+    marginRight: 10,
   },
-  darkBackButton: {
-    backgroundColor: '#000', // Fondo negro en modo oscuro
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataText: {
+    fontSize: 20,
+    color: '#000',
+    marginBottom: 10,
+  },
+  loginButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#78B494',
+    borderRadius: 5,
+  },
+  loginButtonText: {
+    fontSize: 16,
+    color: '#fff',
   },
 });
 
