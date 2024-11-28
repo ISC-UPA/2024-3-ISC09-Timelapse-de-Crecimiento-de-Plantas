@@ -4,10 +4,6 @@ node_modules/
 
 # Archivos generados por Keystone
 .keystone
-db/
-
-# Archivos de configuración de Prisma (puedes ignorar schema.prisma si se genera automáticamente)
-schema.prisma
 
 # Archivos de cache o configuración específicos del entorno
 .DS_Store
