@@ -1,68 +1,104 @@
-import React, { useEffect } from 'react';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Importar los iconos de FontAwesome
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { useQuery } from '@apollo/client';
 import ChartWidget from '@/components/ChartWidget';
-import { GET_MEASUREMENTS,Measurement } from '@/api/queries/queryMeasurements';
+import { GET_MEASUREMENTS, Measurement } from '@/api/queries/queryMeasurements';
 import { apiKey, endpoint } from '@/api/chatGpt/chatConfig';
 import DataTable from '@/components/DataTable';
 import Recommendations from '@/components/Recommendation';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons'; // Importa los íconos de Expo
-
+import { Ionicons } from '@expo/vector-icons';
 
 const { id } = useLocalSearchParams();
-//se crea una funcion que retorna el inicio y fin del dia actual
-const  getDayStartAndEnd =()=> {
+const getDayStartAndEnd = () => {
   const now = new Date();
-
-  // Inicio del día
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfDayISO = startOfDay.toISOString();
-
-  // Fin del día
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
   const endOfDayISO = endOfDay.toISOString();
-
   return {
-      startOfDay: startOfDayISO,
-      endOfDay: endOfDayISO,
+    startOfDay: startOfDayISO,
+    endOfDay: endOfDayISO,
   };
-
-}
-
+};
 
 const DashboardScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 1024;
-
   const params = useLocalSearchParams();
-  console.log(params);
-
   const { startOfDay, endOfDay } = getDayStartAndEnd();
-  const [mesage,setMesage] = React.useState("");
+  const [mesage, setMesage] = React.useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false); // Estado para manejar el tema oscuro
+
   const { data, loading } = useQuery(GET_MEASUREMENTS, {
     variables: {
-      
-        where: {
-          plant: {
-            id: {//aqui deberia de venir el codigo de la planta seleccionada
-              equals: params.id // codigo de planta
-            }
+      where: {
+        plant: {
+          id: {
+            equals: params.id,
           },
-          AND: [
-            {//aqui se pone el rango de fechas que viene de la funcion getDayStartAndEnd
-              date_add: {
-                gt: startOfDay,
-                lt: endOfDay,
-              }
-            }
-          ]
-        }
+        },
+        AND: [
+          {
+            date_add: {
+              gt: startOfDay,
+              lt: endOfDay,
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  useEffect(() => {
+    obtenerConsejo();
+  }, [data]);
+
+  const obtenerConsejo = async () => {
+    const planta = "rosas";
+    const mediciones = data.measurements
+      .map((measurement: Measurement) => {
+        const { date_add, light, temperature, humidity } = measurement;
+        return `${date_add},${light},${temperature},${humidity}`;
+      })
+      .join("\n");
+    const promptContent = `
+      I have a plant ${planta} and these are the light, humidity and temperature measurements along with the time taken from my greenhouse:
+      ${mediciones}
+      What advice do you have for its care?
+    `;
+    const headers = {
+      "Content-Type": "application/json",
+      "api-key": apiKey,
+    };
+    const prompt = {
+      messages: [
+        {
+          role: "user",
+          content: promptContent,
+        },
+      ],
+      max_tokens: 300,
+    };
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(prompt),
+      });
+      if (response.ok) {
+        const responseData = await response.json();
+        setMesage(responseData.choices[0].message.content);
       }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+    }
+  };
 
-  })
-
-  
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode); // Cambiar entre los temas
+  };
 
   if (loading) {
     return (
@@ -70,11 +106,8 @@ const DashboardScreen: React.FC = () => {
         <ActivityIndicator size="large" color="#78B494" />
       </View>
     );
-
   }
 
- 
-//se crea un arreglo con los datos para los graficos
   const dataTempetarure = data.measurements.map((measurement: Measurement) => {
     return {
       value: measurement.temperature,
@@ -91,134 +124,76 @@ const DashboardScreen: React.FC = () => {
     };
   });
 
-
- 
-
-  const obtenerConsejo = async () => {
-    const planta = "rosas";
-  
-    // Construir las mediciones dinámicamente
-    const mediciones = data.measurements
-      .map((measurement: Measurement) => {
-        const { date_add, light, temperature, humidity } = measurement;
-        return `${date_add},${light},${temperature},${humidity}`;
-      })
-      .join("\n"); // Unir las filas en líneas separadas
-  
-    // Construcción dinámica del contenido del prompt
-    const promptContent = `
-      I have a plant ${planta} and these are the light, humidity and temperature measurements along with the time taken from my greenhouse:
-      ${mediciones}
-      What advice do you have for its care?
-    `;
-  
-    // Configuración de la solicitud
-    const headers = {
-      "Content-Type": "application/json",
-      "api-key": apiKey,
-    };
-  
-    const prompt = {
-      messages: [
-        {
-          role: "user",
-          content: promptContent,
-        },
-      ],
-      max_tokens: 300,
-    };
-  
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(prompt),
-      });
-  
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Respuesta:", responseData.choices[0].message.content);
-        setMesage(responseData.choices[0].message.content);
-      } else {
-        console.error(`Error: ${response.status}`);
-        const errorData = await response.json();
-        console.error(errorData);
-      }
-    } catch (error) {
-      console.error("Error en la solicitud:", error);
-    }
+  const calculateAverage = (values: number[]) => {
+    const sum = values.reduce((acc, value) => acc + value, 0);
+    return sum / values.length;
   };
 
-obtenerConsejo();
-// Llamar a la función
+  const lightValues = data.measurements.map((measurement: Measurement) => measurement.light);
+  const humidityValues = data.measurements.map((measurement: Measurement) => measurement.humidity);
+  const temperatureValues = data.measurements.map((measurement: Measurement) => measurement.temperature);
 
-
-    // Función para calcular el promedio de un array de números
-    const calculateAverage = (values: number[]) => {
-      const sum = values.reduce((acc, value) => acc + value, 0);
-      return sum / values.length;
-    };
-
-    // Extraemos los valores de luz, humedad y temperatura
-    const lightValues = data.measurements.map((measurement:Measurement) => measurement.light);
-    const humidityValues = data.measurements.map((measurement:Measurement ) => measurement.humidity);
-    const temperatureValues = data.measurements.map((measurement:Measurement) => measurement.temperature);
-
-    // Calculamos los promedios
-    const averageLight = calculateAverage(lightValues);
-    const averageHumidity = calculateAverage(humidityValues);
-    const averageTemperature = calculateAverage(temperatureValues);
-
-
- 
+  const averageLight = calculateAverage(lightValues);
+  const averageHumidity = calculateAverage(humidityValues);
+  const averageTemperature = calculateAverage(temperatureValues);
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, isLargeScreen && styles.largeContainer]}>
-      
-      {/* Ícono de flecha para volver */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={24} color="#78B494" />
+    <ScrollView contentContainerStyle={[styles.container, isLargeScreen && styles.largeContainer, isDarkMode && styles.darkMode]}>
+      <TouchableOpacity 
+      style={[styles.backButton, isDarkMode && styles.darkBackButton]} 
+      onPress={() => router.back()}>
+      <Ionicons 
+        name="arrow-back" 
+        size={20} 
+        color={isDarkMode ? "#fff" : "#78B494"} // Flecha blanca en modo oscuro
+      />
+      </TouchableOpacity>
+      <TouchableOpacity style={[styles.iconButton, isDarkMode && styles.darkIconButton]} onPress={toggleTheme}>
+        <Icon
+          name={isDarkMode ? 'sun-o' : 'moon-o'} // Usando iconos de FontAwesome
+          size={20}
+          color={isDarkMode ? '#fff' : '#78B494'}
+          style={styles.icon}
+        />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Overview</Text>
-      <Text style={styles.dashboardTitle}>Dashboard</Text>
+      <Text style={[styles.title, isDarkMode && styles.darkTitle]}>Overview</Text>
+      <Text style={[styles.dashboardTitle, isDarkMode && styles.darkDashboardTitle]}>Dashboard</Text>
 
-        <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
-         
-          <ChartWidget title="Temperature" value={averageLight.toFixed(2) + 'lx'} data={dataTempetarure} color="#78B494" />
-          <ChartWidget title="Humidity" value={averageHumidity.toFixed(2) + '%'} data={dataHumidity} color="#4B966E" />
-          <ChartWidget title="Light" value={averageTemperature.toFixed(2) + ' °C'} data={dataLight} color="#28784D" />
+      <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
+        <ChartWidget title="Temperature" value={averageLight.toFixed(2) + 'lx'} data={dataTempetarure} color="#78B494" />
+        <ChartWidget title="Humidity" value={averageHumidity.toFixed(2) + '%'} data={dataHumidity} color="#4B966E" />
+        <ChartWidget title="Light" value={averageTemperature.toFixed(2) + ' °C'} data={dataLight} color="#28784D" />
+      </View>
 
-        </View>
-  
-        <Recommendations planta="Rosas" message={mesage} usuario='Fernanda' />
-
-        <DataTable measurements={data.measurements} /> 
-
-
-     
+      <Recommendations planta="Rosas" message={mesage} usuario="Fernanda" />
+      <DataTable measurements={data.measurements} />
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  //EStilos de la página
   container: {
     backgroundColor: '#f1f1f1',
     paddingVertical: 20,
     flexGrow: 1,
-    alignItems: 'center', // Por defecto, centra las tarjetas
+    alignItems: 'center',
     paddingHorizontal: 10,
-
+  },
+  darkMode: {
+    backgroundColor: '#1E1E1E',
   },
   largeContainer: {
-    alignItems: 'center', // En pantallas grandes, alinea hacia la izquierda
+    alignItems: 'center',
     paddingHorizontal: '20%',
   },
   title: {
     fontSize: 20,
-    color: '#78B494',
+    color: '#000',
     marginTop: 20,
+  },
+  darkTitle: {
+    color: '#A4D08D', // Verde claro para el título en modo oscuro
   },
   dashboardTitle: {
     fontSize: 32,
@@ -226,22 +201,22 @@ const styles = StyleSheet.create({
     color: '#0F5A32',
     marginBottom: 20,
   },
-  //EStilo del loader container
+  darkDashboardTitle: {
+    color: '#fff',
+  },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  //EStilos de las gráficas
   widgetsContainer: {
-    flexDirection: 'column', // Por defecto, organiza en columna
+    flexDirection: 'column',
     width: '100%',
     alignItems: 'center',
   },
   widgetsRow: {
-    flexDirection: 'row', // En pantallas grandes, organiza en fila
-    justifyContent: 'center', // Alinea hacia la derecha
+    flexDirection: 'row',
+    justifyContent: 'center',
     flexWrap: 'wrap',
     width: '100%',
   },
@@ -250,16 +225,36 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     zIndex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 50,
-    padding: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1,
-    elevation: 2, // Para sombra en Android
+    elevation: 2,
   },
-
+  iconButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    zIndex: 1,
+    backgroundColor: '#fff',
+  },
+  darkIconButton:{
+    backgroundColor: '#000'
+    
+  }
+  ,
+  icon: {
+    fontSize: 20,
+  },
+  darkBackButton: {
+    backgroundColor: '#000', // Fondo negro en modo oscuro
+  },
 });
 
 export default DashboardScreen;

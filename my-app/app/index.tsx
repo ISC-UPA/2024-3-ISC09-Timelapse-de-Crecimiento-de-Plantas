@@ -136,7 +136,7 @@ export default function LoginPage() {
       <TouchableOpacity style={styles.iconButton} onPress={toggleTheme}>
             <Icon
               name={isDarkMode ? 'sun-o' : 'moon-o'}
-              color={isDarkMode ? '#fff' : '#000'} // Color del ícono
+              color={isDarkMode ? '#fff' : '#fff'} // Color del ícono
               size={20}
             />
           </TouchableOpacity>

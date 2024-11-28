@@ -68,10 +68,15 @@ const commonStyles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
     borderRadius: 5,
-    marginTop: 10,
+    width: '100%',
+    maxWidth: 250,
+    
   },
   buttonText: {
     fontSize: 16,
@@ -105,13 +110,13 @@ const lightThemeStyles = StyleSheet.create({
     color: '#5a5a5a',
   },
   button: {
-    backgroundColor: '#78B494',
+    backgroundColor: '#336349',
   },
   buttonText: {
     color: '#fff',
   },
   iconButton: {
-    backgroundColor: '#78B494',
+    backgroundColor: '#FFF',
   },
 });
 
@@ -126,13 +131,13 @@ const darkThemeStyles = StyleSheet.create({
     color: '#d1d1d1',
   },
   button: {
-    backgroundColor: '#4B966E',
+    backgroundColor: '#336349',
   },
   buttonText: {
     color: '#ffffff',
   },
   iconButton: {
-    backgroundColor: '#4B966E',
+    backgroundColor: '#000',
   },
 });
 
