@@ -4,7 +4,7 @@ export default (colorScheme: 'light' | 'dark') => StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: colorScheme === 'light' ? '#D0FDD7' : '#1E1E1E', // Fondo general
+    backgroundColor: colorScheme === 'light' ? '#F1F1F1' : '#1E1E1E', // Fondo general
   },
   loginContainer: {
     flex: 1,
@@ -12,7 +12,7 @@ export default (colorScheme: 'light' | 'dark') => StyleSheet.create({
   },
   welcomeSection: {
     flex: 1,
-    backgroundColor: colorScheme === 'light' ? '#2A8C4A' : '#333333', // Fondo de bienvenida
+    backgroundColor: colorScheme === 'light' ? '#28784D' : '#333333', // Fondo de bienvenida
     justifyContent: 'center',
     padding: 30,
   },
@@ -69,4 +69,22 @@ export default (colorScheme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 16,
     color: colorScheme === 'light' ? '#2A8C4A' : '#A1C9A1', // Mensaje de login en verde oscuro o más claro en modo oscuro
   },
+  icon: {
+    // tintColor: colorScheme === 'light' ? '#0000' : '#ffffff', // Color del ícono según el esquema de color
+  },
+  iconButton: {
+    position: 'absolute',
+    top: 0,
+    left: 10,
+    backgroundColor: '#78B494', 
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  
+  
+  
 });

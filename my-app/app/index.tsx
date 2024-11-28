@@ -6,9 +6,10 @@ import {
   useAuthRequest,
   useAutoDiscovery,
 } from 'expo-auth-session';
-import { Text, SafeAreaView, useColorScheme, TouchableOpacity, Image, View, Platform, Dimensions } from 'react-native';
-import createStyles from './styles/loginpage'; // Importa los estilos dinámicos
+import { Text, SafeAreaView, TouchableOpacity, Image, View, Platform, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router'; // Importa useRouter
+import Icon from 'react-native-vector-icons/FontAwesome'; // Para el ícono de modo oscuro/claro
+import createStyles from './styles/loginpage'; // Importa los estilos dinámicos
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -16,20 +17,18 @@ const { width, height } = Dimensions.get('window'); // Obtiene las dimensiones d
 
 export default function LoginPage() {
   const router = useRouter(); // Inicializa el hook de navegación
-  const colorScheme = useColorScheme(); // Detecta el tema claro u oscuro
-  const styles = createStyles(colorScheme || 'light'); // Aplica los estilos según el tema
+  const [isDarkMode, setIsDarkMode] = useState(false); // Estado para alternar entre temas
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Para indicar si estamos verificando el token al inicio
+
+  const styles = createStyles(isDarkMode ? 'dark' : 'light'); // Estilos dinámicos según el tema
 
   const discovery = useAutoDiscovery(
     'https://login.microsoftonline.com/2803e296-cffb-471f-a4b5-988a45052db6/v2.0'
   );
   const tokenEndpoint = 'https://login.microsoftonline.com/2803e296-cffb-471f-a4b5-988a45052db6/oauth2/v2.0/token';
-
   const redirectUri = makeRedirectUri({ scheme: 'myapp', path: '' });
   const clientId = 'b6003d17-274d-46dd-87fc-ee9633ef41b0';
-
-
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Para indicar si estamos verificando el token al inicio
 
   const [request, , promptAsync] = useAuthRequest(
     {
@@ -52,23 +51,6 @@ export default function LoginPage() {
     loadToken();
   }, []);
 
-  const decodeJwt = (token: string) => {
-    try {
-      const base64Url = token.split('.')[1]; // Extrae la parte del payload
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Convierte a base64 estándar
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-          .join('')
-      );
-      return JSON.parse(jsonPayload); // Devuelve el payload decodificado como objeto
-    } catch (error) {
-      console.error('Error al decodificar el token', error);
-      return null;
-    }
-  };
-
   const handleSignIn = async () => {
     const codeResponse = await promptAsync();
     if (request && codeResponse?.type === 'success' && discovery) {
@@ -83,52 +65,28 @@ export default function LoginPage() {
       );
 
       setToken(res.accessToken);
+      localStorage.setItem('accessToken', res.accessToken);
+      localStorage.setItem('refreshToken', res.refreshToken ?? '');
+      localStorage.setItem('expiresIn', res.expiresIn?.toString() || '');
+      localStorage.setItem('issuedAt', res.issuedAt.toString());
 
-      try {
-        // Decodificar el token para obtener la información del usuario
-        const decoded = decodeJwt(res.idToken);
-        if (decoded) {
-          const email = decoded.email || '';
-          const username = email.split('@')[0]; // Usa la parte local del correo como nombre de usuario
-
-          // Guardar en localStorage
-          localStorage.setItem('accessToken', res.accessToken);
-          localStorage.setItem('refreshToken', res.refreshToken ?? '');
-          localStorage.setItem('expiresIn', res.expiresIn?.toString() || '');
-          localStorage.setItem('issuedAt', res.issuedAt.toString());
-          localStorage.setItem('email', email);
-          localStorage.setItem('username', username);
-
-          console.log('Datos del usuario guardados correctamente');
-
-          // Redirigir al usuario a /dashboardpage
-          const iddevice = 'cm3usu7ko00013v36s97yrq9n'; // ID fijo o dinámico según tu lógica
-          router.push({
-            pathname: '/(tabs)/plants/[id]',
-            params: { id: iddevice }, // Pasa el parámetro iddevice como "id"
-          });
-        } else {
-          console.error('No se pudo decodificar el token');
-        }
-      } catch (error) {
-        console.error('Error al guardar los datos del usuario', error);
-      }
+      router.push({
+        pathname: '/(tabs)/plants/[id]',
+        params: { id: 'cm3usu7ko00013v36s97yrq9n' },
+      });
     }
   };
 
   const handleSignOut = () => {
-    try {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('expiresIn');
-      localStorage.removeItem('issuedAt');
-      localStorage.removeItem('email');
-      localStorage.removeItem('username');
-      setToken(null);
-      console.log('Sesión cerrada y tokens eliminados');
-    } catch (error) {
-      console.error('Error al eliminar el token de localStorage', error);
-    }
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('expiresIn');
+    localStorage.removeItem('issuedAt');
+    setToken(null);
+  };
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode); // Alternar el modo
   };
 
   return (
@@ -154,11 +112,19 @@ export default function LoginPage() {
                   source={require('../assets/images/microsoft.png')}
                   style={[styles.buttonImage, { width: 24, height: 24 }]} 
                 />
-                <Text style={[styles.buttonText, Platform.OS === 'web' ? { fontSize: 14 } : { fontSize: 12 }]}>{token ? 'Cerrar sesión' : 'Iniciar sesión con Azure'}</Text>
+                <Text style={[styles.buttonText, Platform.OS === 'web' ? { fontSize: 14 } : { fontSize: 12 }]}>{token ? 'Log out' : 'Log in with Microsoft'}</Text>
               </View>
             </TouchableOpacity>
-            <Text style={styles.loginMessage}>{token ? 'Sesión iniciada' : 'Por favor, inicia sesión'}</Text>
+            <Text style={styles.loginMessage}>{token ? 'Logged in' : 'Please login'}</Text>
           </View>
+          <TouchableOpacity style={styles.iconButton} onPress={toggleTheme}>
+            <Icon
+              name={isDarkMode ? 'sun-o' : 'moon-o'}
+              color={isDarkMode ? '#fff' : '#000'} // Color del ícono
+              size={20}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
         </View>
       )}
     </SafeAreaView>
