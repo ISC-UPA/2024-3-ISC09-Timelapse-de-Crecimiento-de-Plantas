@@ -18,8 +18,8 @@ EXPOSE 8081
 
 #Construcción de la aplicación
 
-RUN npm build
+RUN npm run build
 
 # Comando para compilar y correr la aplicación
 
-CMD ["npm", "start"]
+CMD ["npm", "run","start"]
