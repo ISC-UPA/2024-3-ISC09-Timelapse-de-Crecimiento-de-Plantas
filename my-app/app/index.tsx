@@ -25,6 +25,8 @@ export default function Index() {
         localStorage.setItem('username', result.guestUser.name);
 
         router.replace('/plants'); // Redirige a /plants
+      } else{
+        router.replace('/access-denied')
       }
     },
     onError: (error) => {
