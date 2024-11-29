@@ -4,6 +4,7 @@ export interface User  {
     id: string;
     name:string;
     email:string;
+    device: string;
 }
 
 
@@ -24,6 +25,7 @@ query GuestUser($where: GuestUserWhereUniqueInput!) {
     device {
       id
     }
+    email
   }
 }
 `
