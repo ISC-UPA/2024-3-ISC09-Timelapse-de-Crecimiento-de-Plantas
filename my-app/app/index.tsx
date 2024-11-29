@@ -1,32 +1,30 @@
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/auth/authContext'; // Usa el contexto de autenticación
-import { useEffect } from 'react';
+import { useAuth } from '@/auth/authContext';
+import { useEffect, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_USER } from '@/api/queries/queryUser';
-import { useState } from 'react';
 
 export default function Index() {
-  const { isAuthenticated, loading ,handleAuth} = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-
   const [isMounted, setIsMounted] = useState(false);
 
-  // Marca el componente como montado
+  // Verifica si el router está listo y el componente está montado
   useEffect(() => {
+    if (!router) {
+      return; // Espera hasta que el router esté listo
+    }
     setIsMounted(true);
-  }, []);
+  }, [router]);
 
-  
   const [getUser] = useLazyQuery(GET_USER, {
-    onCompleted: (result:any) => {
-     // console.log('Datos obtenidos:', result.guestUser);
-
+    onCompleted: (result: any) => {
       if (result?.guestUser) {
         console.log('Datos obtenidos:', result.guestUser.name);
-        localStorage.setItem('device', result.guestUser. device.id);
-        localStorage.setItem('username', result.guestUser. name);
-        
-        router.replace( '/plants')
+        localStorage.setItem('device', result.guestUser.device.id);
+        localStorage.setItem('username', result.guestUser.name);
+
+        router.replace('/plants'); // Redirige a /plants
       }
     },
     onError: (error) => {
@@ -34,24 +32,22 @@ export default function Index() {
     },
   });
 
-
   useEffect(() => {
-    if (loading) {
-      // Espera a que el layout esté completamente montado
-      return;
+    if (!isMounted || !router|| loading) {
+      return; // Espera a que el layout esté montado, el router esté listo y termine de cargar
     }
 
-    if ( !isAuthenticated ) {
+    if (!isAuthenticated) {
       console.log('No autenticado');
-      console.log('email:',localStorage.getItem('email'));
-      console.log('accestoken', localStorage.getItem('accessToken'))      // Redirige al login si no está autenticado
-      router.replace('/login');
-    } else if ( isAuthenticated) {
-      // Redirige a /plants si está autenticado
-      getUser({ variables: { where: { email:localStorage.getItem('email')  } } });
-   
+      router.replace('/login'); // Redirige a /login si no está autenticado
+    } else {
+      getUser({
+        variables: {
+          where: { email: localStorage.getItem('email') },
+        },
+      });
     }
-  }, [loading, isAuthenticated, router,isMounted]);
+  }, [loading, isAuthenticated, isMounted, router]);
 
-  return null; // No renderiza nada, solo redirige
+  return null; // No renderiza nada mientras verifica el estado
 }
