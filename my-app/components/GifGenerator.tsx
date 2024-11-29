@@ -1,48 +1,49 @@
 import React, { useEffect, useState } from 'react';
-import gifshot from 'gifshot';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 
-interface GifGeneratorProps {
+interface GifSimulatorProps {
   imageUrls: string[]; // URLs de las imágenes
+  frameRate?: number; // Cuántos cuadros por segundo (FPS)
 }
 
-const GifGenerator: React.FC<GifGeneratorProps> = ({ imageUrls }) => {
-  const [gifUrl, setGifUrl] = useState<string | null>(null);
+const GifSimulator: React.FC<GifSimulatorProps> = ({ imageUrls, frameRate = 10 }) => {
+  const [currentFrame, setCurrentFrame] = useState(0);
 
   useEffect(() => {
     if (imageUrls.length > 0) {
-      gifshot.createGIF(
-        {
-          images: imageUrls,
-          gifWidth: 300,
-          gifHeight: 300,
-          interval: 0.5,
-        },
-        (obj) => {
-          if (!obj.error) {
-            setGifUrl(obj.image);
-          } else {
-            console.error('Error al crear el GIF:', obj.errorMsg);
-          }
-        }
-      );
+      // Calcula el intervalo en milisegundos basado en los FPS
+      const interval = 1000 / frameRate;
+
+      const timer = setInterval(() => {
+        setCurrentFrame((prevFrame) => (prevFrame + 1) % imageUrls.length);
+      }, interval);
+
+      // Limpia el intervalo cuando el componente se desmonta
+      return () => clearInterval(timer);
     }
-  }, [imageUrls]);
+  }, [imageUrls, frameRate]);
+
+  if (imageUrls.length === 0) {
+    return null; // No hay imágenes para mostrar
+  }
 
   return (
     <View style={styles.container}>
-      {gifUrl ? (
-        <Image source={{ uri: gifUrl }} style={styles.gif} />
-      ) : (
-        <Text>Generando GIF...</Text>
-      )}
+      <Image source={{ uri: imageUrls[currentFrame] }} style={styles.image} />
     </View>
   );
 };
 
-export default GifGenerator;
+export default GifSimulator;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  gif: { width: 300, height: 300 },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: 300,
+    height: 300,
+  },
 });

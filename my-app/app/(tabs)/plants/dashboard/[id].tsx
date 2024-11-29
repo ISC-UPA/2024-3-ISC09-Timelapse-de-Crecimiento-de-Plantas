@@ -10,6 +10,7 @@ import Recommendations from '@/components/Recommendation';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import GifGenerator from '@/components/GifGenerator';
+import { useAuth } from '@/auth/authContext';
 
 const { id } = useLocalSearchParams();
 const getDayStartAndEnd = () => {
@@ -24,6 +25,7 @@ const getDayStartAndEnd = () => {
   };
 };
 
+
 const DashboardScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 1024;
@@ -33,6 +35,8 @@ const DashboardScreen: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const {isAuthenticated} = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
 
 
   const { data, loading } = useQuery(GET_MEASUREMENTS, {
@@ -56,6 +60,19 @@ const DashboardScreen: React.FC = () => {
   });
 
   useEffect(() => {
+    if (!isMounted) {
+      setIsMounted(true);
+    }
+
+    if (!isAuthenticated){
+      router.replace('/access-denied');
+    }
+    obtenerConsejo();
+  }, [isMounted]);
+
+
+  useEffect(() => {
+  
     obtenerConsejo();
   }, [data]);
 
@@ -73,6 +90,7 @@ const DashboardScreen: React.FC = () => {
   
 
   const obtenerConsejo = async () => {
+    if (!data || !data.measurements || data.measurements.length === 0) return;
     const planta = params.name;
     const mediciones = data.measurements
       .map((measurement: Measurement) => {

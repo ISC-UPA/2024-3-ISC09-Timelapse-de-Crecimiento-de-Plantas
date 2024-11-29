@@ -14,7 +14,8 @@ import PlantCard from '@/components/PlantCard';
 import { GET_PLANTS, Plant } from '@/api/queries/queryPlants';
 import { Link, useRouter } from 'expo-router';
 import { FontAwesome as Icon } from '@expo/vector-icons'; // Importa los íconos de FontAwesome
-
+import { useAuth } from '@/auth/authContext'; // Importa el hook useAuth
+ 
 const PlantPage: React.FC = () => {
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -24,6 +25,7 @@ const PlantPage: React.FC = () => {
   // Detecta el tema del sistema
   const systemTheme = useColorScheme(); // 'light' o 'dark'
   const [isDarkMode, setIsDarkMode] = useState(systemTheme === 'dark'); // Estado para el tema
+ 
 
   // Cambia el tema manualmente
   const toggleTheme = () => {
@@ -34,6 +36,10 @@ const PlantPage: React.FC = () => {
   useEffect(() => {
     setIsDarkMode(systemTheme === 'dark');
   }, [systemTheme]);
+
+  const { isAuthenticated, login } = useAuth();
+
+
 
   // Query para obtener las plantas del dispositivo
   const { data, loading, error } = useQuery(GET_PLANTS, {
@@ -48,6 +54,26 @@ const PlantPage: React.FC = () => {
       },
     },
   });
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Marca el componente como montado
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) {
+      // Espera a que el layout esté completamente montado
+      return;
+    }
+
+    if (!isAuthenticated) {
+      // Si no está autenticado, redirige al login
+      console.log('No autenticado');
+      router.replace('/access-denied');
+    } 
+  }, [isAuthenticated, isMounted, router]);
 
   // Estilos dinámicos según el tema
   const dynamicStyles = getStyles(isDarkMode);
@@ -67,6 +93,8 @@ const PlantPage: React.FC = () => {
       </View>
     );
   }
+
+
 
   const plants: Plant[] = data?.plants || [];
 

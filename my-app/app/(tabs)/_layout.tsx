@@ -5,6 +5,7 @@ import client from '@/api/apolloClient'; // Ruta al cliente Apollo configurado
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { AuthProvider } from '@/auth/authContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -12,6 +13,7 @@ export default function TabLayout() {
   return (
     // Envolvemos las pestañas dentro de ApolloProvider
     <ApolloProvider client={client}>
+      <AuthProvider>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
@@ -42,19 +44,9 @@ export default function TabLayout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="loginpage"
-          options={{
-            title: 'Loginpage',
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon
-                name={focused ? 'log-in' : 'log-in-outline'}
-                color={color}
-              />
-            ),
-          }}
-        />
+   
       </Tabs>
+      </AuthProvider>
     </ApolloProvider>
   );
 }
