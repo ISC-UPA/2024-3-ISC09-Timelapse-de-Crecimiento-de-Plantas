@@ -1,4 +1,4 @@
-import React from 'react'; 
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import { Measurement } from '@/api/queries/queryMeasurements';
 
@@ -30,18 +30,19 @@ const DataTable: React.FC<DataTableProps> = ({ measurements }) => {
         <Text style={[styles.tableHeaderText, isLargeScreen && styles.largeTableHeaderText]}>Humidity (%)</Text>
         <Text style={[styles.tableHeaderText, isLargeScreen && styles.largeTableHeaderText]}>Temperature (°C)</Text>
       </View>
-      <View>
+      {/* Contenedor de las filas con overflow */}
+      <ScrollView style={styles.tableRowsContainer}>
         {measurements.map((measurement, index) => (
           <View key={index} style={styles.tableRow}>
             <Text style={styles.tableCell}>
-              {new Date(measurement.date_add).toLocaleString([], { hour: '2-digit', hour12: true })} 
+              {new Date(measurement.date_add).toLocaleString([], { hour: '2-digit', hour12: true })}
             </Text>
             <Text style={styles.tableCell}>{measurement.light} lx</Text>
-            <Text style={styles.tableCell}>{getHumidityStatus(measurement.humidity)} </Text>
+            <Text style={styles.tableCell}>{getHumidityStatus(measurement.humidity)}</Text>
             <Text style={styles.tableCell}>{measurement.temperature} °C</Text>
           </View>
         ))}
-      </View>
+      </ScrollView>
     </ScrollView>
   );
 };
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   title: {
-    fontSize: 18, 
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'left',
     marginBottom: 15,
@@ -100,6 +101,10 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 13,
+  },
+  tableRowsContainer: {
+    maxHeight: 300, // Limita la altura de la tabla antes de hacer scroll (ajusta según tus necesidades)
+    overflow: 'auto', // Esto permite el desbordamiento
   },
 });
 
