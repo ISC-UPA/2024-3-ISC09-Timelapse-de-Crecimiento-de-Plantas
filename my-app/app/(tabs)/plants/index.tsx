@@ -204,7 +204,7 @@ const getStyles = (isDarkMode: boolean) =>
     },
     iconButton: {
       position: 'absolute',
-      top: 20,
+      bottom: 20,
       right: 20,
       paddingVertical: 10,
       paddingHorizontal: 15,

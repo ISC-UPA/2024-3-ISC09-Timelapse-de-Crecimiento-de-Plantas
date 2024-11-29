@@ -10,6 +10,17 @@ const DataTable: React.FC<DataTableProps> = ({ measurements }) => {
   const { width } = useWindowDimensions(); // Obtenemos las dimensiones de la ventana
   const isLargeScreen = width > 1024; // Consideramos pantallas grandes como aquellas con un ancho mayor a 1024px
 
+  // Función para obtener el estado de humedad (wet/dry)
+  const getHumidityStatus = (humidity: number) => {
+    if (humidity === 1) {
+      return 'Wet';
+    } else if (humidity === 0) {
+      return 'Dry';
+    } else {
+      return `${humidity.toFixed(2)}%`; // Si no es 1 o 0, mostramos el valor como porcentaje
+    }
+  };
+
   return (
     <ScrollView style={[styles.tableContainer, isLargeScreen && styles.largeTableContainer]}>
       <Text style={styles.title}>Historical Data</Text>  {/* Título agregado aquí */}
@@ -26,7 +37,7 @@ const DataTable: React.FC<DataTableProps> = ({ measurements }) => {
               {new Date(measurement.date_add).toLocaleString([], { hour: '2-digit', hour12: true })} 
             </Text>
             <Text style={styles.tableCell}>{measurement.light} lx</Text>
-            <Text style={styles.tableCell}>{measurement.humidity} %</Text>
+            <Text style={styles.tableCell}>{getHumidityStatus(measurement.humidity)} </Text>
             <Text style={styles.tableCell}>{measurement.temperature} °C</Text>
           </View>
         ))}

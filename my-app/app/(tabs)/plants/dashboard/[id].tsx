@@ -197,6 +197,21 @@ const DashboardScreen: React.FC = () => {
   const averageLight = calculateAverage(lightValues);
   const averageHumidity = calculateAverage(humidityValues);
   const averageTemperature = calculateAverage(temperatureValues);
+ 
+  const getHumidityLabel = (humidity) => {
+    if (humidity === 1) {
+      return 'Wet';
+    } else if (humidity === 0) {
+      return 'Dry';
+    }
+    return `${humidity.toFixed(2)}%`;  // Si no es 0 ni 1, se muestra el valor con dos decimales.
+  };
+  const measurementsWithHumidityStatus = data.measurements.map((measurement: Measurement) => {
+    return {
+      ...measurement,
+      humidityStatus: getHumidityLabel(measurement.humidity), // Agregar el valor "wet" o "dry"
+    };
+  });
 
   return (
     <ScrollView contentContainerStyle={[styles.container, isLargeScreen && styles.largeContainer, isDarkMode && styles.darkMode]}>
@@ -217,6 +232,19 @@ const DashboardScreen: React.FC = () => {
           style={styles.icon}
         />
       </TouchableOpacity>
+  
+
+      <Text style={[styles.title, isDarkMode && styles.darkTitle]}>Overview</Text>
+      <Text style={[styles.dashboardTitle, isDarkMode && styles.darkDashboardTitle]}>Dashboard</Text>
+
+      <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
+        <ChartWidget title="Light" value={averageLight.toFixed(2) + ' lx'} data={dataTempetarure} color="#78B494" />
+        <ChartWidget title="Humidity" value={getHumidityLabel(averageHumidity)} data={dataHumidity} color="#4B966E" />
+        <ChartWidget title="Temperature" value={averageTemperature.toFixed(2) + '°C'} data={dataLight} color="#28784D" />
+      </View>
+
+      <Recommendations planta={params.name} message={message} usuario={username} />
+      <DataTable measurements={measurementsWithHumidityStatus} /> {/* Pasamos los datos modificados */}
       <View style={styles.container}>
       {imageUrls.length > 0 ? (
         <GifGenerator imageUrls={imageUrls} />
@@ -224,18 +252,6 @@ const DashboardScreen: React.FC = () => {
         <Text>No hay imágenes disponibles</Text>
       )}
     </View>
-
-      <Text style={[styles.title, isDarkMode && styles.darkTitle]}>Overview</Text>
-      <Text style={[styles.dashboardTitle, isDarkMode && styles.darkDashboardTitle]}>Dashboard</Text>
-
-      <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
-        <ChartWidget title="Temperature" value={averageLight.toFixed(2) + ' °C'} data={dataTempetarure} color="#78B494" />
-        <ChartWidget title="Humidity" value={averageHumidity.toFixed(2) + '%'} data={dataHumidity} color="#4B966E" />
-        <ChartWidget title="Light" value={averageTemperature.toFixed(2) + 'lx'} data={dataLight} color="#28784D" />
-      </View>
-
-      <Recommendations planta={params.name} message={message} usuario={username} />
-      <DataTable measurements={data.measurements} />
     </ScrollView>
   );
 };
@@ -299,7 +315,7 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     position: 'absolute',
-    top: 20,
+    bottom: 20,
     right: 20,
   },
   darkIconButton: {

@@ -3,11 +3,20 @@ import { View, Text, StyleSheet, TouchableOpacity, useColorScheme } from 'react-
 import { useRouter } from 'expo-router';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Importa el ícono
 import Logo from '@/components/Logo'; // Ajusta la ruta si es diferente
+import { useAuth } from '@/auth/authContext';
+
 
 const AccessDeniedScreen: React.FC = () => {
   const router = useRouter();
   const systemColorScheme = useColorScheme(); // Detectar el tema del sistema
   const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === 'dark');
+  const {isAuthenticated, handleAuth, logout} = useAuth();
+
+
+  const handleLogout = () => {
+    logout()   
+    router.push('/');
+  };
 
   useEffect(() => {
     // Actualizar el tema si el sistema cambia
@@ -31,7 +40,7 @@ const AccessDeniedScreen: React.FC = () => {
       </Text>
       <TouchableOpacity
         style={[commonStyles.button, themeStyles.button]}
-        onPress={() => router.replace('/')}
+        onPress={handleLogout}
       >
         <Text style={[commonStyles.buttonText, themeStyles.buttonText]}>Back to Login</Text>
       </TouchableOpacity>
