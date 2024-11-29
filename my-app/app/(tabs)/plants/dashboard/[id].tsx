@@ -9,6 +9,7 @@ import DataTable from '@/components/DataTable';
 import Recommendations from '@/components/Recommendation';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import UserInfo from '../../../../components/UserInfo';
 
 const { id } = useLocalSearchParams();
 const getDayStartAndEnd = () => {
@@ -31,6 +32,10 @@ const DashboardScreen: React.FC = () => {
   const [message, setMessage] = React.useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
+  
+  // Aquí podrías agregar condicionales para Device y Email
+  const isDeviceConnected = true; // Cambia esto a la lógica que desees
+  const hasEmailVerified = true;  // Cambia esto a la lógica que desees
 
   const { data, loading } = useQuery(GET_MEASUREMENTS, {
     variables: {
@@ -101,7 +106,6 @@ const DashboardScreen: React.FC = () => {
     setIsDarkMode(!isDarkMode); // Cambiar entre los temas
   };
 
-  // Verificar si no hay datos de mediciones
   const noDataAvailable = !data || !data.measurements || data.measurements.length === 0;
 
   if (loading) {
@@ -112,7 +116,6 @@ const DashboardScreen: React.FC = () => {
     );
   }
 
-  // Si no hay datos disponibles, mostrar mensaje y botón de login
   if (noDataAvailable) {
     return (
       <View style={styles.noDataContainer}>
@@ -125,19 +128,13 @@ const DashboardScreen: React.FC = () => {
   }
 
   const dataTempetarure = data.measurements.map((measurement: Measurement) => {
-    return {
-      value: measurement.temperature,
-    };
+    return { value: measurement.temperature };
   });
   const dataHumidity = data.measurements.map((measurement: Measurement) => {
-    return {
-      value: measurement.humidity,
-    };
+    return { value: measurement.humidity };
   });
   const dataLight = data.measurements.map((measurement: Measurement) => {
-    return {
-      value: measurement.light,
-    };
+    return { value: measurement.light };
   });
 
   const calculateAverage = (values: number[]) => {
@@ -153,30 +150,35 @@ const DashboardScreen: React.FC = () => {
   const averageHumidity = calculateAverage(humidityValues);
   const averageTemperature = calculateAverage(temperatureValues);
 
+  const handleLogout = () => {
+    localStorage.removeItem('username');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('expiresIn');
+    localStorage.removeItem('issuedAt');
+    router.push('/');
+  };
+
   return (
     <ScrollView contentContainerStyle={[styles.container, isLargeScreen && styles.largeContainer, isDarkMode && styles.darkMode]}>
-      <TouchableOpacity 
-      style={[styles.backButton, isDarkMode && styles.darkBackButton]} 
-      onPress={() => router.back()}>
-        <Ionicons 
-          name="arrow-back" 
-          size={20} 
-          color={isDarkMode ? "#fff" : "#78B494"} // Flecha blanca en modo oscuro
-        />
+      <TouchableOpacity style={[styles.backButton, isDarkMode && styles.darkBackButton]} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={20} color={isDarkMode ? "#fff" : "#78B494"} />
       </TouchableOpacity>
+
       <TouchableOpacity style={[styles.iconButton, isDarkMode && styles.darkIconButton]} onPress={toggleTheme}>
-        <Icon
-          name={isDarkMode ? 'sun-o' : 'moon-o'} // Usando iconos de FontAwesome
-          size={20}
-          color={isDarkMode ? '#fff' : '#78B494'}
-          style={styles.icon}
-        />
+        <Icon name={isDarkMode ? 'sun-o' : 'moon-o'} size={20} color={isDarkMode ? '#fff' : '#78B494'} style={styles.icon} />
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.logoutButton, isDarkMode && styles.darkLogoutButton]} onPress={handleLogout}>
+        <Text style={[styles.logoutButtonText, isDarkMode && styles.darkLogoutButtonText]}>Logout</Text>
       </TouchableOpacity>
 
       <Text style={[styles.title, isDarkMode && styles.darkTitle]}>Overview</Text>
+      <UserInfo />
+
       <Text style={[styles.dashboardTitle, isDarkMode && styles.darkDashboardTitle]}>Dashboard</Text>
 
-      <View style={[styles.widgetsContainer, isLargeScreen && styles.widgetsRow]}>
+      <View style={[styles.widgetsContainer, isLargeScreen ? styles.widgetsRow : styles.widgetsColumn]}>
         <ChartWidget title="Temperature" value={averageLight.toFixed(2) + ' °C'} data={dataTempetarure} color="#78B494" />
         <ChartWidget title="Humidity" value={averageHumidity.toFixed(2) + '%'} data={dataHumidity} color="#4B966E" />
         <ChartWidget title="Light" value={averageTemperature.toFixed(2) + 'lx'} data={dataLight} color="#28784D" />
@@ -225,6 +227,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: '#78B494',
+    padding: 10,
+    borderRadius: 5,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
   widgetsContainer: {
     flexDirection: 'column',
     width: '100%',
@@ -236,14 +256,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     width: '100%',
   },
-  backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 1,
-  },
-  darkBackButton: {
-    backgroundColor: '#333',
+  widgetsColumn: {
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   iconButton: {
     position: 'absolute',
@@ -251,30 +266,48 @@ const styles = StyleSheet.create({
     right: 20,
   },
   darkIconButton: {
+    color: '#fff',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+  },
+  darkBackButton: {
+    color: '#fff',
+  },
+  logoutButton: {
+    position: 'absolute',
+    top: 20,
+    right: 60,
+  },
+  darkLogoutButton: {
     backgroundColor: '#333',
   },
-  icon: {
-    marginRight: 10,
+  logoutButtonText: {
+    fontSize: 14,
+    color: '#78B494',
   },
-  noDataContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  noDataText: {
-    fontSize: 20,
-    color: '#000',
-    marginBottom: 10,
-  },
-  loginButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#78B494',
-    borderRadius: 5,
-  },
-  loginButtonText: {
-    fontSize: 16,
+  darkLogoutButtonText: {
     color: '#fff',
+  },
+  deviceContainer: {
+    marginTop: 20,
+  },
+  deviceConnected: {
+    backgroundColor: '#78B494',
+  },
+  deviceDisconnected: {
+    backgroundColor: '#FF6F61',
+  },
+  emailContainer: {
+    marginTop: 20,
+  },
+  emailVerified: {
+    backgroundColor: '#78B494',
+  },
+  emailNotVerified: {
+    backgroundColor: '#FF6F61',
   },
 });
 
