@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   tableContainer: {
     padding: 15,
     borderRadius: 12,
-    backgroundColor: '#64C27B',
+    backgroundColor: '#4B966E',
     overflow: 'scroll',
     marginVertical: 10,
     alignSelf: 'center', // Centra la tabla en la pantalla
@@ -63,14 +63,14 @@ const styles = StyleSheet.create({
   tableHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 0,
+    paddingVertical: 3,
     borderBottomWidth: 1,
     borderBottomColor: '#fff',
   },
   tableHeaderText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 13,
     flex: 1,
     textAlign: 'center',
   },

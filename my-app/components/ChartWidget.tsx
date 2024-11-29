@@ -43,8 +43,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center', // Centra en pantallas pequeñas
   },
   largeWidget: {
-    width: 350, // En pantallas grandes, fija el ancho
-    marginHorizontal: 10, // Espaciado entre tarjetas
+    width: '31%', // En pantallas grandes, fija el ancho
+    marginHorizontal: 5, // Espaciado entre tarjetas
+    // alignItems:'baseline',
   },
   card: {
     borderRadius: 12,
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
   },
   widgetTitle: {
     fontSize: 18,
-    color: '#0F5A32',
+    color: '#ffffff',
     fontWeight: '500',
   },
   widgetValue: {

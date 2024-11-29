@@ -30,21 +30,23 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
     padding: 15,
-    backgroundColor: '#D0FDD7',
+    backgroundColor: '#A5D8B4',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
     marginVertical: 10,
+    width: '90%',
   },
   largeContainer: {
     width: '95%',
 },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#0F5A32',
+    fontWeight: '500',
+    // textAlign: 'center',
+    color: '#ffffff',
     marginBottom: 10,
   },
   largeTitle: {
