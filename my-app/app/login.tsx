@@ -39,7 +39,7 @@ export default function LoginPage() {
   );
 
   const tokenEndpoint = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
-  const redirectUri = 'https://plantguard-aresarcbc2b7hvad.eastus-01.azurewebsites.net/callback';
+  const redirectUri = makeRedirectUri({ scheme: 'myapp', path: '' });
   const clientId = 'b6003d17-274d-46dd-87fc-ee9633ef41b0';
 
   const [token, setToken] = useState<string | null>(null);
