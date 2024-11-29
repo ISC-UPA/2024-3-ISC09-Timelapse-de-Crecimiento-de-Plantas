@@ -9,6 +9,7 @@ import DataTable from '@/components/DataTable';
 import Recommendations from '@/components/Recommendation';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import GifGenerator from '@/components/GifGenerator';
 
 const { id } = useLocalSearchParams();
 const getDayStartAndEnd = () => {
@@ -31,6 +32,8 @@ const DashboardScreen: React.FC = () => {
   const [message, setMessage] = React.useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+
 
   const { data, loading } = useQuery(GET_MEASUREMENTS, {
     variables: {
@@ -55,6 +58,19 @@ const DashboardScreen: React.FC = () => {
   useEffect(() => {
     obtenerConsejo();
   }, [data]);
+
+  useEffect(() => {
+    if (data && data.measurements) {
+      // Mapea el arreglo de measurements para extraer las URLs de las imágenes
+      const urls = data.measurements
+        .filter((measurement: { image: { url_image: string } | null }) => measurement.image) // Filtra solo los elementos con imágenes
+        .map((measurement: { image: { url_image: string } }) => measurement.image.url_image);
+      setImageUrls(urls);
+    }
+  }, [data]);
+  
+  console.log(imageUrls);
+  
 
   const obtenerConsejo = async () => {
     const planta = params.name;
@@ -96,6 +112,17 @@ const DashboardScreen: React.FC = () => {
       console.error("Error en la solicitud:", error);
     }
   };
+
+    
+
+  // const imageUrls = [
+  //   'my-app\assets\images\favicon.png'
+  //   'my-app\assets\images\icon.png'
+  //   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4nGpTMrmrArzvqj0pdJwSOYVwdEgG_2hQmA&s',
+  //   'https://www.shutterstock.com/image-illustration/sleek-metallic-black-number-1-260nw-2528404485.jpg',
+  //   'https://st.depositphotos.com/1006006/1881/i/450/depositphotos_18816503-stock-photo-number-one.jpg'
+  // ];
+
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode); // Cambiar entre los temas
@@ -172,6 +199,13 @@ const DashboardScreen: React.FC = () => {
           style={styles.icon}
         />
       </TouchableOpacity>
+      <View style={styles.container}>
+      {imageUrls.length > 0 ? (
+        <GifGenerator imageUrls={imageUrls} />
+      ) : (
+        <Text>No hay imágenes disponibles</Text>
+      )}
+    </View>
 
       <Text style={[styles.title, isDarkMode && styles.darkTitle]}>Overview</Text>
       <Text style={[styles.dashboardTitle, isDarkMode && styles.darkDashboardTitle]}>Dashboard</Text>

@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:3000/api/graphql', // Asegúrate de que esta URL sea correcta
+  uri: 'https://plantguardapi-fye0b9hvdvh9a6d9.eastus-01.azurewebsites.net/api/graphql', // Asegúrate de que esta URL sea correcta
 });
 
 const authLink = setContext((_, { headers }) => {
